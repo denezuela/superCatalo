@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
+#include "imageprovider.h"
 
 int main(int argc, char *argv[])
 {
@@ -8,5 +9,5 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
-    return app.exec();
+   return app.exec();
 }

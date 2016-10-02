@@ -12,10 +12,10 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DQT_QML_DEBUG -DQT_QUICK_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_QML_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB
+DEFINES       = -DQT_QML_DEBUG -DQT_QUICK_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_QML_LIB -DQT_NETWORK_LIB -DQT_SQL_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -g -std=gnu++11 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I../superCatalo -I. -isystem /usr/include/qt -isystem /usr/include/qt/QtQuick -isystem /usr/include/qt/QtWidgets -isystem /usr/include/qt/QtGui -isystem /usr/include/qt/QtQml -isystem /usr/include/qt/QtNetwork -isystem /usr/include/qt/QtCore -I. -I/usr/lib/qt/mkspecs/linux-g++
+INCPATH       = -I../superCatalo -I. -isystem /usr/include/qt -isystem /usr/include/qt/QtQuick -isystem /usr/include/qt/QtWidgets -isystem /usr/include/qt/QtGui -isystem /usr/include/qt/QtQml -isystem /usr/include/qt/QtNetwork -isystem /usr/include/qt/QtSql -isystem /usr/include/qt/QtCore -I. -I/usr/lib/qt/mkspecs/linux-g++
 QMAKE         = /usr/lib/qt/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -36,7 +36,7 @@ DISTNAME      = superCatalo1.0.0
 DISTDIR = /home/skt/superCatalo/build-superCatalo-Desktop-Debug/.tmp/superCatalo1.0.0
 LINK          = g++
 LFLAGS        = 
-LIBS          = $(SUBLIBS) -lQt5Quick -lQt5Widgets -lQt5Gui -lQt5Qml -lQt5Network -lQt5Core -lGL -lpthread 
+LIBS          = $(SUBLIBS) -lQt5Quick -lQt5Widgets -lQt5Gui -lQt5Qml -lQt5Network -lQt5Sql -lQt5Core -lGL -lpthread 
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -48,9 +48,13 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = ../superCatalo/main.cpp qrc_qml.cpp
+SOURCES       = ../superCatalo/main.cpp \
+		../superCatalo/imageprovider.cpp qrc_qml.cpp \
+		moc_imageprovider.cpp
 OBJECTS       = main.o \
-		qrc_qml.o
+		imageprovider.o \
+		qrc_qml.o \
+		moc_imageprovider.o
 DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/common/unix.conf \
 		/usr/lib/qt/mkspecs/common/linux.conf \
@@ -190,6 +194,7 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/features/qt_config.prf \
 		/usr/lib/qt/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/qt/mkspecs/features/spec_post.prf \
+		../superCatalo/.qmake.stash \
 		/usr/lib/qt/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/qt/mkspecs/features/default_pre.prf \
 		/usr/lib/qt/mkspecs/features/resolve_config.prf \
@@ -207,7 +212,8 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/features/exceptions.prf \
 		/usr/lib/qt/mkspecs/features/yacc.prf \
 		/usr/lib/qt/mkspecs/features/lex.prf \
-		../superCatalo/superCatalo.pro  ../superCatalo/main.cpp
+		../superCatalo/superCatalo.pro ../superCatalo/imageprovider.h ../superCatalo/main.cpp \
+		../superCatalo/imageprovider.cpp
 QMAKE_TARGET  = superCatalo
 DESTDIR       = 
 TARGET        = superCatalo
@@ -358,6 +364,7 @@ Makefile: ../superCatalo/superCatalo.pro /usr/lib/qt/mkspecs/linux-g++/qmake.con
 		/usr/lib/qt/mkspecs/features/qt_config.prf \
 		/usr/lib/qt/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/qt/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/usr/lib/qt/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/qt/mkspecs/features/default_pre.prf \
 		/usr/lib/qt/mkspecs/features/resolve_config.prf \
@@ -382,6 +389,7 @@ Makefile: ../superCatalo/superCatalo.pro /usr/lib/qt/mkspecs/linux-g++/qmake.con
 		/usr/lib/libQt5Gui.prl \
 		/usr/lib/libQt5Qml.prl \
 		/usr/lib/libQt5Network.prl \
+		/usr/lib/libQt5Sql.prl \
 		/usr/lib/libQt5Core.prl
 	$(QMAKE) -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug -o Makefile ../superCatalo/superCatalo.pro
 /usr/lib/qt/mkspecs/features/spec_pre.prf:
@@ -523,6 +531,7 @@ Makefile: ../superCatalo/superCatalo.pro /usr/lib/qt/mkspecs/linux-g++/qmake.con
 /usr/lib/qt/mkspecs/features/qt_config.prf:
 /usr/lib/qt/mkspecs/linux-g++/qmake.conf:
 /usr/lib/qt/mkspecs/features/spec_post.prf:
+.qmake.stash:
 /usr/lib/qt/mkspecs/features/exclusive_builds.prf:
 /usr/lib/qt/mkspecs/features/default_pre.prf:
 /usr/lib/qt/mkspecs/features/resolve_config.prf:
@@ -547,6 +556,7 @@ Makefile: ../superCatalo/superCatalo.pro /usr/lib/qt/mkspecs/linux-g++/qmake.con
 /usr/lib/libQt5Gui.prl:
 /usr/lib/libQt5Qml.prl:
 /usr/lib/libQt5Network.prl:
+/usr/lib/libQt5Sql.prl:
 /usr/lib/libQt5Core.prl:
 qmake: FORCE
 	@$(QMAKE) -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug -o Makefile ../superCatalo/superCatalo.pro
@@ -563,7 +573,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../superCatalo/qml.qrc $(DISTDIR)/
-	$(COPY_FILE) --parents ../superCatalo/main.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../superCatalo/imageprovider.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../superCatalo/main.cpp ../superCatalo/imageprovider.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -596,8 +607,13 @@ qrc_qml.cpp: ../superCatalo/qml.qrc \
 		../superCatalo/main.qml
 	/usr/lib/qt/bin/rcc -name qml ../superCatalo/qml.qrc -o qrc_qml.cpp
 
-compiler_moc_header_make_all:
+compiler_moc_header_make_all: moc_imageprovider.cpp
 compiler_moc_header_clean:
+	-$(DEL_FILE) moc_imageprovider.cpp
+moc_imageprovider.cpp: ../superCatalo/imageprovider.h \
+		/usr/lib/qt/bin/moc
+	/usr/lib/qt/bin/moc $(DEFINES) -I/usr/lib/qt/mkspecs/linux-g++ -I/home/skt/superCatalo/superCatalo -I/usr/include/qt -I/usr/include/qt/QtQuick -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtGui -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtSql -I/usr/include/qt/QtCore -I. -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/i686-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/i686-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/i686-pc-linux-gnu/6.2.1/include-fixed -I/usr/include ../superCatalo/imageprovider.h -o moc_imageprovider.cpp
+
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
 compiler_uic_make_all:
@@ -608,15 +624,21 @@ compiler_yacc_impl_make_all:
 compiler_yacc_impl_clean:
 compiler_lex_make_all:
 compiler_lex_clean:
-compiler_clean: compiler_rcc_clean 
+compiler_clean: compiler_rcc_clean compiler_moc_header_clean 
 
 ####### Compile
 
 main.o: ../superCatalo/main.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../superCatalo/main.cpp
 
+imageprovider.o: ../superCatalo/imageprovider.cpp ../superCatalo/imageprovider.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o imageprovider.o ../superCatalo/imageprovider.cpp
+
 qrc_qml.o: qrc_qml.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_qml.o qrc_qml.cpp
+
+moc_imageprovider.o: moc_imageprovider.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_imageprovider.o moc_imageprovider.cpp
 
 ####### Install
 

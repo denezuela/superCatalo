@@ -2,11 +2,12 @@ TEMPLATE = app
 
 QT += qml quick widgets
 
-QT += SQL
+QT += sql
 
 CONFIG += c++11
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    imageprovider.cpp
 
 RESOURCES += qml.qrc
 
@@ -17,3 +18,6 @@ QML_IMPORT_PATH =
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+HEADERS += \
+    imageprovider.h
