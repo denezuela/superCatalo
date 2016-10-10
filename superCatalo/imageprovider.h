@@ -4,33 +4,52 @@
 #include <QObject>
 #include <QAbstractItemModel>
 #include <QSqlDatabase>
-#include <QDebug>
 #include <QString>
+#include <QList>
+
+enum dataType {ROOT, SEMESTER, COURSE, LECTURE, IMAGE};
+
+struct dbData{
+    qint64 id;
+    qint64 pid;
+    qint64 number;
+    QString path;
+    QString comments;
+    QString tags;
+    QString type;
+};
+
+struct DataWrapper {
+    qint64 id;
+    dataType type;
+    dbData* data;
+    qint64 number;
+    DataWrapper* parent_pointer;
+    QList<DataWrapper*> children;
+    qint64 childrenCount;
+};
 
 class ImageProvider : public QAbstractItemModel
 {
-    Q_OBJECT
+    private:
+        Q_OBJECT
+        QSqlDatabase db;
+        DataWrapper root{0, ROOT, nullptr, 0, nullptr, {}, 0};
 
-    struct Node {
-        qint64 id;
-        qint64 pid;
-        QString path;
-        QString text;
-        QString comments;
-        QString tags;
-    };
+    public:
+        ImageProvider(QAbstractItemModel *parent = 0);
+        ~ImageProvider();
+        virtual QVariant data(const QModelIndex &index, int role) const;
+        virtual QModelIndex index(int row, int column, const QModelIndex &index) const;
+        virtual int rowCount(const QModelIndex &index) const;
+        virtual int columnCount(const QModelIndex &index) const;
+        virtual QModelIndex parent(const QModelIndex &index) const;
+        void fetchAll(const QModelIndex &parent);
+        void forTests();
 
-public:
-    explicit ImageProvider(QAbstractItemModel *parent = 0);
-    virtual QVariant data(const QModelIndex &index, int role) const;
-    virtual QModelIndex index(int row, int column, const QModelIndex &index) const;
-    virtual int rowCount(const QModelIndex &index) const;
-    virtual int columnCount(const QModelIndex &index) const;
-    virtual QModelIndex parent(const QModelIndex &index) const;
+    signals:
 
-signals:
-
-public slots:
+    public slots:
 };
 
 #endif // IMAGEPROVIDER_H
