@@ -1,6 +1,8 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QTreeView>
+#include <QDebug>
+#include <QModelIndex>
 #include "imageprovider.h"
 
 int main(int argc, char *argv[])
@@ -8,8 +10,8 @@ int main(int argc, char *argv[])
 
     QApplication app(argc, argv);
 
-    QQmlApplicationEngine engine;
-    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+//    QQmlApplicationEngine engine;
+//    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
     ImageProvider ip;
 
@@ -17,5 +19,5 @@ int main(int argc, char *argv[])
     treeView.setModel(&ip);
     treeView.show();
 
-    //return app.exec();
+    return app.exec();
 }

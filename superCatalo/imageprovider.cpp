@@ -20,21 +20,27 @@ ImageProvider::ImageProvider(QAbstractItemModel *parent) : QAbstractItemModel(pa
     QModelIndex rootIndex = createIndex(0, 0, &root);
     fetchAll(rootIndex);
 
-    qDebug() << root.children.size();
     for (int i = 0; i != root.children.size(); ++i) {
         QModelIndex semesterIndex = createIndex(i, 0,  root.children[i]);
         fetchAll(semesterIndex);
 
         DataWrapper* ptr = (DataWrapper*)semesterIndex.internalPointer();
         QList<DataWrapper*> courses = ptr->children;
-        qDebug() << ptr->id;
 
         for (int j = 0; j != courses.size(); ++j) {
             QModelIndex courseIndex = createIndex(j, 0, courses[j]);
             fetchAll(courseIndex);
-        }
 
+            DataWrapper* ptr = (DataWrapper*)courseIndex.internalPointer();
+            QList<DataWrapper*> images = ptr->children;
+
+            for (int k = 0; k != images.size(); ++k) {
+                QModelIndex imageIndex = createIndex(k, 0, images[k]);
+                fetchAll(imageIndex);
+            }
+        }
     }
+
     forTests();
 }
 
@@ -42,7 +48,14 @@ QVariant ImageProvider::data (const QModelIndex &index, int role) const {
 
     if (!index.isValid())
         return QVariant();
-    return 1;
+
+    if (role == Qt::DisplayRole) {
+        DataWrapper* ptr = (DataWrapper*) index.internalPointer();
+        qDebug() << ptr->id;
+        return ptr->id;
+    }
+    else
+        return QVariant();
 }
 
 QModelIndex ImageProvider::index(int row, int column, const QModelIndex &parent) const {
@@ -67,7 +80,12 @@ QModelIndex ImageProvider::index(int row, int column, const QModelIndex &parent)
 }
 
 int ImageProvider::rowCount(const QModelIndex &index) const {
+    if (!index.isValid()) {
+        return -1;
+    }
+
     DataWrapper* ptr = (DataWrapper*)index.internalPointer();
+    qDebug() << ptr->childrenCount;
     return ptr->childrenCount;
 }
 
@@ -122,12 +140,25 @@ void ImageProvider::fetchAll(const QModelIndex &parent) {
 }
 
 void ImageProvider::forTests() {
-    qDebug() << root.children[0]->children[0]->children[0]->data->path;
+
+//    QModelIndex rootIndex = createIndex(0, 0, &root);
+//    QModelIndex index = this->index(0, 0, rootIndex);
+//   DataWrapper* ptr = (DataWrapper*)rootIndex.internalPointer();
+//   qDebug() << ptr->children[0]->children[0]->children[0]->children.size();
+
+//    DataWrapper* ptr = root.children[0];
+//    QModelIndex index = createIndex(0, 0, ptr);
+//    QModelIndex par = this->parent(index);
+//    DataWrapper* ptr2 = (DataWrapper*)par.internalPointer();
+//    qDebug() << ptr2->id;
+
+//    qDebug() << this->data(index, 0);
+
 }
 
 ImageProvider::~ImageProvider() {
     db.close();
-   // delete &root;
+    delete &root;
 }
 
 
