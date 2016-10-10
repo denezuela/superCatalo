@@ -44,9 +44,24 @@ QVariant ImageProvider::data (const QModelIndex &index, int role) const {
 }
 
 QModelIndex ImageProvider::index(int row, int column, const QModelIndex &parent) const {
+
+    if (column != 0)
+        return QModelIndex();
+
+    if (!parent.isValid())
+        return createIndex(row, column, root.children[row]);
+
     DataWrapper* ptr = (DataWrapper*)parent.internalPointer();
+
+    if (ptr->type == IMAGE)
+        return QModelIndex();
+
+    if (ptr->children.size() <= row)
+        return QModelIndex();
+
     DataWrapper* dataWrapperForIndex = ptr->children[row];
     QModelIndex result = createIndex(row, column, dataWrapperForIndex);
+    return result;
 }
 
 int ImageProvider::rowCount(const QModelIndex &index) const {
@@ -64,10 +79,12 @@ QModelIndex ImageProvider::parent(const QModelIndex &index) const {
 }
 
 void ImageProvider::fetchAll(const QModelIndex &parent) {
+
     DataWrapper* parentDataWrapper = (DataWrapper*)parent.internalPointer();
+    parentDataWrapper->children.clear();
 
     QSqlQuery query;
-    query.prepare("SELECT * FROM IMAGES WHERE PID=:id");
+    query.prepare("SELECT * FROM IMAGES WHERE PID=:id ORDER BY number");
     query.bindValue(":id", parentDataWrapper->id);
     query.exec();
 
@@ -75,13 +92,13 @@ void ImageProvider::fetchAll(const QModelIndex &parent) {
       DataWrapper* childWrapper = new DataWrapper;
       dbData* childData = new dbData;
 
-      childData->id = query.value("id").toInt();
-      childData->comments = query.value("comment").toString();
-      childData->number = query.value("number").toInt()-1;
-      childData->pid = query.value("pid").toInt();
-      childData->tags = query.value("tags").toString();
-      childData->type = query.value("type").toString();
-      childData->path = query.value("path").toString();
+      auto id = query.value("id").toInt();
+      auto comments = query.value("comment").toString();
+      auto number = query.value("number").toInt()-1;
+      auto pid = query.value("pid").toInt();
+      QStringList tags = query.value("tags").toStringList();
+      auto type = query.value("type").toString();
+      auto path = query.value("path").toString();
 
       childWrapper->data = childData;
       childWrapper->children = {};
@@ -90,9 +107,9 @@ void ImageProvider::fetchAll(const QModelIndex &parent) {
       childWrapper->number=childData->number;
       childWrapper->parent_pointer = parentDataWrapper;
 
-      if (childData->type == "semester")
+      if (type == "semester")
         childWrapper->type = SEMESTER;
-      else if (childData->type == "course")
+      else if (type == "course")
         childWrapper->type = COURSE;
       else
         childWrapper->type = IMAGE;

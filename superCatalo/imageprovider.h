@@ -6,6 +6,7 @@
 #include <QSqlDatabase>
 #include <QString>
 #include <QList>
+#include <QStringList>
 
 enum dataType {ROOT, SEMESTER, COURSE, LECTURE, IMAGE};
 
@@ -15,7 +16,7 @@ struct dbData{
     qint64 number;
     QString path;
     QString comments;
-    QString tags;
+    QStringList tags;
     QString type;
 };
 
