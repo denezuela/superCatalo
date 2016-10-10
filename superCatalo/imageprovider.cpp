@@ -20,12 +20,14 @@ ImageProvider::ImageProvider(QAbstractItemModel *parent) : QAbstractItemModel(pa
     QModelIndex rootIndex = createIndex(0, 0, &root);
     fetchAll(rootIndex);
 
-    QList<DataWrapper*> semesters = root.children;
-    for (int i = 0; i != semesters.size(); ++i) {
-        QModelIndex semesterIndex = createIndex(i, 0, semesters[i]);
+    qDebug() << root.children.size();
+    for (int i = 0; i != root.children.size(); ++i) {
+        QModelIndex semesterIndex = createIndex(i, 0,  root.children[i]);
         fetchAll(semesterIndex);
 
-        QList<DataWrapper*> courses = semesters[i]->children;
+        DataWrapper* ptr = (DataWrapper*)semesterIndex.internalPointer();
+        QList<DataWrapper*> courses = ptr->children;
+        qDebug() << ptr->id;
 
         for (int j = 0; j != courses.size(); ++j) {
             QModelIndex courseIndex = createIndex(j, 0, courses[j]);
@@ -92,13 +94,13 @@ void ImageProvider::fetchAll(const QModelIndex &parent) {
       DataWrapper* childWrapper = new DataWrapper;
       dbData* childData = new dbData;
 
-      auto id = query.value("id").toInt();
-      auto comments = query.value("comment").toString();
-      auto number = query.value("number").toInt()-1;
-      auto pid = query.value("pid").toInt();
-      QStringList tags = query.value("tags").toStringList();
-      auto type = query.value("type").toString();
-      auto path = query.value("path").toString();
+      childData->id = query.value("id").toInt();
+      childData->comments = query.value("comment").toString();
+      childData->number = query.value("number").toInt()-1;
+      childData->pid = query.value("pid").toInt();
+      childData->tags = query.value("tags").toStringList();
+      childData->type = query.value("type").toString();
+      childData->path = query.value("path").toString();
 
       childWrapper->data = childData;
       childWrapper->children = {};
@@ -107,9 +109,9 @@ void ImageProvider::fetchAll(const QModelIndex &parent) {
       childWrapper->number=childData->number;
       childWrapper->parent_pointer = parentDataWrapper;
 
-      if (type == "semester")
+      if (childData->type == "semester")
         childWrapper->type = SEMESTER;
-      else if (type == "course")
+      else if (childData->type == "course")
         childWrapper->type = COURSE;
       else
         childWrapper->type = IMAGE;
@@ -125,7 +127,7 @@ void ImageProvider::forTests() {
 
 ImageProvider::~ImageProvider() {
     db.close();
-    //delete &root;
+   // delete &root;
 }
 
 
