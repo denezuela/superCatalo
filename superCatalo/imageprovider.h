@@ -40,7 +40,7 @@ class ImageProvider : public QAbstractItemModel
         ImageProvider(QAbstractItemModel *parent = 0);
         ~ImageProvider();
         virtual QVariant data(const QModelIndex &index, int role) const;
-        virtual QModelIndex index(int row, int column, const QModelIndex &index) const;
+        virtual QModelIndex index(int row, int column, const QModelIndex &parent) const;
         virtual int rowCount(const QModelIndex &index) const;
         virtual int columnCount(const QModelIndex &index) const;
         virtual QModelIndex parent(const QModelIndex &index) const;

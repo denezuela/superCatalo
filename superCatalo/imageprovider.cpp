@@ -19,6 +19,20 @@ ImageProvider::ImageProvider(QAbstractItemModel *parent) : QAbstractItemModel(pa
 
     QModelIndex rootIndex = createIndex(0, 0, &root);
     fetchAll(rootIndex);
+
+    QList<DataWrapper*> semesters = root.children;
+    for (int i = 0; i != semesters.size(); ++i) {
+        QModelIndex semesterIndex = createIndex(i, 0, semesters[i]);
+        fetchAll(semesterIndex);
+
+        QList<DataWrapper*> courses = semesters[i]->children;
+
+        for (int j = 0; j != courses.size(); ++j) {
+            QModelIndex courseIndex = createIndex(j, 0, courses[j]);
+            fetchAll(courseIndex);
+        }
+
+    }
     forTests();
 }
 
@@ -26,15 +40,18 @@ QVariant ImageProvider::data (const QModelIndex &index, int role) const {
 
     if (!index.isValid())
         return QVariant();
-    return QVariant();
+    return 1;
 }
 
-QModelIndex ImageProvider::index(int row, int column, const QModelIndex &index) const {
-    return index;
+QModelIndex ImageProvider::index(int row, int column, const QModelIndex &parent) const {
+    DataWrapper* ptr = (DataWrapper*)parent.internalPointer();
+    DataWrapper* dataWrapperForIndex = ptr->children[row];
+    QModelIndex result = createIndex(row, column, dataWrapperForIndex);
 }
 
 int ImageProvider::rowCount(const QModelIndex &index) const {
-    return 0;
+    DataWrapper* ptr = (DataWrapper*)index.internalPointer();
+    return ptr->childrenCount;
 }
 
 int ImageProvider::columnCount(const QModelIndex &index) const {
@@ -42,7 +59,8 @@ int ImageProvider::columnCount(const QModelIndex &index) const {
 }
 
 QModelIndex ImageProvider::parent(const QModelIndex &index) const {
-    return index;
+    DataWrapper* ptr = (DataWrapper*)index.internalPointer();
+    return createIndex(ptr->parent_pointer->number, 0, ptr->parent_pointer);
 }
 
 void ImageProvider::fetchAll(const QModelIndex &parent) {
@@ -59,7 +77,7 @@ void ImageProvider::fetchAll(const QModelIndex &parent) {
 
       childData->id = query.value("id").toInt();
       childData->comments = query.value("comment").toString();
-      childData->number = query.value("number").toInt();
+      childData->number = query.value("number").toInt()-1;
       childData->pid = query.value("pid").toInt();
       childData->tags = query.value("tags").toString();
       childData->type = query.value("type").toString();
@@ -85,7 +103,12 @@ void ImageProvider::fetchAll(const QModelIndex &parent) {
 }
 
 void ImageProvider::forTests() {
-    qDebug() << root.children[0]->id;
+    qDebug() << root.children[0]->children[0]->children[0]->data->path;
+}
+
+ImageProvider::~ImageProvider() {
+    db.close();
+    //delete &root;
 }
 
 

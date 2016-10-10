@@ -628,7 +628,7 @@ compiler_clean: compiler_rcc_clean compiler_moc_header_clean
 
 ####### Compile
 
-main.o: ../superCatalo/main.cpp 
+main.o: ../superCatalo/main.cpp ../superCatalo/imageprovider.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../superCatalo/main.cpp
 
 imageprovider.o: ../superCatalo/imageprovider.cpp ../superCatalo/imageprovider.h
