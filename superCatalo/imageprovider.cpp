@@ -24,14 +24,14 @@ ImageProvider::ImageProvider(QAbstractItemModel *parent) : QAbstractItemModel(pa
         QModelIndex semesterIndex = createIndex(i, 0,  root.children[i]);
         fetchAll(semesterIndex);
 
-        DataWrapper* ptr = (DataWrapper*)semesterIndex.internalPointer();
+        DataWrapper* ptr = dataForIndex(semesterIndex);
         QList<DataWrapper*> courses = ptr->children;
 
         for (int j = 0; j != courses.size(); ++j) {
             QModelIndex courseIndex = createIndex(j, 0, courses[j]);
             fetchAll(courseIndex);
 
-            DataWrapper* ptr = (DataWrapper*)courseIndex.internalPointer();
+            DataWrapper* ptr = dataForIndex(courseIndex);
             QList<DataWrapper*> images = ptr->children;
 
             for (int k = 0; k != images.size(); ++k) {
@@ -50,9 +50,9 @@ QVariant ImageProvider::data (const QModelIndex &index, int role) const {
         return QVariant();
 
     if (role == Qt::DisplayRole) {
-        DataWrapper* ptr = (DataWrapper*) index.internalPointer();
-        qDebug() << ptr->id;
-        return ptr->id;
+        const DataWrapper* ptr = dataForIndex(index);
+        //qDebug() << ptr->id;
+        return ptr->data->comments;
     }
     else
         return QVariant();
@@ -66,7 +66,7 @@ QModelIndex ImageProvider::index(int row, int column, const QModelIndex &parent)
     if (!parent.isValid())
         return createIndex(row, column, root.children[row]);
 
-    DataWrapper* ptr = (DataWrapper*)parent.internalPointer();
+    const DataWrapper* ptr = dataForIndex(parent);
 
     if (ptr->type == IMAGE)
         return QModelIndex();
@@ -80,27 +80,44 @@ QModelIndex ImageProvider::index(int row, int column, const QModelIndex &parent)
 }
 
 int ImageProvider::rowCount(const QModelIndex &index) const {
+
     if (!index.isValid()) {
-        return -1;
+        return root.childrenCount;
     }
 
-    DataWrapper* ptr = (DataWrapper*)index.internalPointer();
-    qDebug() << ptr->childrenCount;
+    const DataWrapper* ptr = dataForIndex(index);
+    //qDebug() << ptr->childrenCount;
     return ptr->childrenCount;
 }
 
 int ImageProvider::columnCount(const QModelIndex &index) const {
-    return 0;
+    return 1;
 }
 
 QModelIndex ImageProvider::parent(const QModelIndex &index) const {
-    DataWrapper* ptr = (DataWrapper*)index.internalPointer();
+
+    if (!index.isValid()) {
+        return QModelIndex();
+    }
+
+    const DataWrapper* ptr = dataForIndex(index);
+
+    if (ptr == nullptr) {
+        return QModelIndex();
+    }
+
+    if (ptr->parent_pointer == nullptr) {
+        return QModelIndex();
+    }
+
+    //qDebug() << ptr->parent_pointer->id;
+
     return createIndex(ptr->parent_pointer->number, 0, ptr->parent_pointer);
 }
 
 void ImageProvider::fetchAll(const QModelIndex &parent) {
 
-    DataWrapper* parentDataWrapper = (DataWrapper*)parent.internalPointer();
+    DataWrapper* parentDataWrapper = dataForIndex(parent);
     parentDataWrapper->children.clear();
 
     QSqlQuery query;
@@ -142,9 +159,9 @@ void ImageProvider::fetchAll(const QModelIndex &parent) {
 void ImageProvider::forTests() {
 
 //    QModelIndex rootIndex = createIndex(0, 0, &root);
-//    QModelIndex index = this->index(0, 0, rootIndex);
-//   DataWrapper* ptr = (DataWrapper*)rootIndex.internalPointer();
-//   qDebug() << ptr->children[0]->children[0]->children[0]->children.size();
+////    QModelIndex index = this->index(0, 0, rootIndex);
+//    DataWrapper* ptr = (DataWrapper*)rootIndex.internalPointer();
+//    qDebug() << ptr->children[0]->children[0]->children[0]->data->path;
 
 //    DataWrapper* ptr = root.children[0];
 //    QModelIndex index = createIndex(0, 0, ptr);
@@ -161,4 +178,25 @@ ImageProvider::~ImageProvider() {
     delete &root;
 }
 
+const DataWrapper* ImageProvider::dataForIndex(const QModelIndex &index) const {
+    if (!index.isValid())
+        return &root;
 
+    return static_cast<DataWrapper*>(index.internalPointer());
+}
+
+DataWrapper* ImageProvider::dataForIndex(const QModelIndex &index) {
+    if (!index.isValid())
+        return &root;
+
+    return static_cast<DataWrapper*>(index.internalPointer());
+}
+
+void ImageProvider::fetchMore(const QModelIndex &parent) {
+    fetchAll(parent);
+}
+
+bool ImageProvider::canFetchMore(const QModelIndex &parent) {
+    const DataWrapper* ptr = dataForIndex(parent);
+    return ptr->childrenCount > 0;
+}

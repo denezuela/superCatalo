@@ -47,6 +47,10 @@ class ImageProvider : public QAbstractItemModel
         virtual QModelIndex parent(const QModelIndex &index) const;
         void fetchAll(const QModelIndex &parent);
         void forTests();
+        const DataWrapper* dataForIndex(const QModelIndex &parent) const;
+        DataWrapper* dataForIndex(const QModelIndex &parent);
+        void fetchMore(const QModelIndex &parent);
+        bool canFetchMore(const QModelIndex &parent);
 
     signals:
 
