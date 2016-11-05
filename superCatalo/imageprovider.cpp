@@ -47,7 +47,7 @@ ImageProvider::ImageProvider(QAbstractItemModel *parent) : QAbstractItemModel(pa
 QVariant ImageProvider::data (const QModelIndex &index, int role) const {
 
     if (!index.isValid())
-        return QVariant();
+        return {};
 
     if (role == Qt::DisplayRole) {
         const DataWrapper* ptr = dataForIndex(index);
@@ -64,7 +64,7 @@ QModelIndex ImageProvider::index(int row, int column, const QModelIndex &parent)
         return QModelIndex();
 
     if (!parent.isValid())
-        return createIndex(row, column, root.children[row]);
+        return createIndex(row, column, static_cast<void*>(root.children[row]));
 
     const DataWrapper* ptr = dataForIndex(parent);
 
@@ -75,7 +75,7 @@ QModelIndex ImageProvider::index(int row, int column, const QModelIndex &parent)
         return QModelIndex();
 
     DataWrapper* dataWrapperForIndex = ptr->children[row];
-    QModelIndex result = createIndex(row, column, dataWrapperForIndex);
+    QModelIndex result = createIndex(row, column, static_cast<void*>(dataWrapperForIndex));
     return result;
 }
 
@@ -106,13 +106,13 @@ QModelIndex ImageProvider::parent(const QModelIndex &index) const {
         return QModelIndex();
     }
 
-    if (ptr->parent_pointer == nullptr) {
+    if (!ptr->parent_pointer) {
         return QModelIndex();
     }
 
     //qDebug() << ptr->parent_pointer->id;
 
-    return createIndex(ptr->parent_pointer->number, 0, ptr->parent_pointer);
+    return createIndex(ptr->parent_pointer->number, 0, static_cast<void*>(ptr->parent_pointer));
 }
 
 void ImageProvider::fetchAll(const QModelIndex &parent) {
@@ -198,5 +198,17 @@ void ImageProvider::fetchMore(const QModelIndex &parent) {
 
 bool ImageProvider::canFetchMore(const QModelIndex &parent) {
     const DataWrapper* ptr = dataForIndex(parent);
-    return ptr->childrenCount > 0;
+    return (ptr->childrenCount > 0);
+}
+
+void ImageProvider::addSemester(qint64 semesterNumber) {
+    QSqlQuery query;
+    query.prepare("INSERT INTO IMAGES (pid, number, path, comment, tags, type) VALUES (:pid, :number, :path, :comment, :tags, :type)" );
+    query.bindValue(":pid", root.id);
+    query.bindValue(":number", semesterNumber);
+    query.bindValue(":path", "NO_PATH");s
+    query.bindValue(":comment", QString::number(semesterNumber) + " semester");
+    query.bindValue(":tags", "NO_TAGS");
+    query.bindValue(":type", "semester");
+    query.exec();
 }

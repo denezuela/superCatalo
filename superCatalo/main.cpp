@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
 
     ImageProvider ip;
 
+    ip.addSemester(3);
     QTreeView treeView;
     treeView.setModel(&ip);
     treeView.show();

@@ -51,6 +51,9 @@ class ImageProvider : public QAbstractItemModel
         DataWrapper* dataForIndex(const QModelIndex &parent);
         void fetchMore(const QModelIndex &parent);
         bool canFetchMore(const QModelIndex &parent);
+        void addSemester(qint64 semesterNumber);
+        void addCourse(qint64 semesterNumber, QString courseName);
+        void addImage(qint64 semesterNumber, QString courseName, QString imagePath);
 
     signals:
 
