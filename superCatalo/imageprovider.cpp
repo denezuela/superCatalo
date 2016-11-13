@@ -18,30 +18,8 @@ ImageProvider::ImageProvider(QAbstractItemModel *parent) : QAbstractItemModel(pa
     }
 
     QModelIndex rootIndex = createIndex(0, 0, &root);
+    root.childrenCount = getChildrenCount(root.id);
     fetchAll(rootIndex);
-
-    for (int i = 0; i != root.children.size(); ++i) {
-        QModelIndex semesterIndex = createIndex(i, 0,  root.children[i]);
-        fetchAll(semesterIndex);
-
-        DataWrapper* ptr = dataForIndex(semesterIndex);
-        QList<DataWrapper*> courses = ptr->children;
-
-        for (int j = 0; j != courses.size(); ++j) {
-            QModelIndex courseIndex = createIndex(j, 0, courses[j]);
-            fetchAll(courseIndex);
-
-            DataWrapper* ptr = dataForIndex(courseIndex);
-            QList<DataWrapper*> images = ptr->children;
-
-            for (int k = 0; k != images.size(); ++k) {
-                QModelIndex imageIndex = createIndex(k, 0, images[k]);
-                fetchAll(imageIndex);
-            }
-        }
-    }
-
-    forTests();
 }
 
 QVariant ImageProvider::data (const QModelIndex &index, int role) const {
@@ -51,7 +29,6 @@ QVariant ImageProvider::data (const QModelIndex &index, int role) const {
 
     if (role == Qt::DisplayRole) {
         const DataWrapper* ptr = dataForIndex(index);
-        //qDebug() << ptr->id;
         return ptr->data->comments;
     }
     else
@@ -64,7 +41,7 @@ QModelIndex ImageProvider::index(int row, int column, const QModelIndex &parent)
         return QModelIndex();
 
     if (!parent.isValid())
-        return createIndex(row, column, static_cast<void*>(root.children[row]));
+        return createIndex(row, column, root.children[row]);
 
     const DataWrapper* ptr = dataForIndex(parent);
 
@@ -75,7 +52,7 @@ QModelIndex ImageProvider::index(int row, int column, const QModelIndex &parent)
         return QModelIndex();
 
     DataWrapper* dataWrapperForIndex = ptr->children[row];
-    QModelIndex result = createIndex(row, column, static_cast<void*>(dataWrapperForIndex));
+    QModelIndex result = createIndex(row, column, dataWrapperForIndex);
     return result;
 }
 
@@ -86,7 +63,6 @@ int ImageProvider::rowCount(const QModelIndex &index) const {
     }
 
     const DataWrapper* ptr = dataForIndex(index);
-    //qDebug() << ptr->childrenCount;
     return ptr->childrenCount;
 }
 
@@ -109,8 +85,6 @@ QModelIndex ImageProvider::parent(const QModelIndex &index) const {
     if (!ptr->parent_pointer) {
         return QModelIndex();
     }
-
-    //qDebug() << ptr->parent_pointer->id;
 
     return createIndex(ptr->parent_pointer->number, 0, static_cast<void*>(ptr->parent_pointer));
 }
@@ -139,10 +113,11 @@ void ImageProvider::fetchAll(const QModelIndex &parent) {
 
       childWrapper->data = childData;
       childWrapper->children = {};
-      childWrapper->childrenCount = 0;
       childWrapper->id = childData->id;
       childWrapper->number=childData->number;
       childWrapper->parent_pointer = parentDataWrapper;
+
+      childWrapper->childrenCount = getChildrenCount(childWrapper->id);
 
       if (childData->type == "semester")
         childWrapper->type = SEMESTER;
@@ -152,24 +127,10 @@ void ImageProvider::fetchAll(const QModelIndex &parent) {
         childWrapper->type = IMAGE;
 
       parentDataWrapper->children.append(childWrapper);
-      parentDataWrapper->childrenCount += 1;
     }
 }
 
 void ImageProvider::forTests() {
-
-//    QModelIndex rootIndex = createIndex(0, 0, &root);
-////    QModelIndex index = this->index(0, 0, rootIndex);
-//    DataWrapper* ptr = (DataWrapper*)rootIndex.internalPointer();
-//    qDebug() << ptr->children[0]->children[0]->children[0]->data->path;
-
-//    DataWrapper* ptr = root.children[0];
-//    QModelIndex index = createIndex(0, 0, ptr);
-//    QModelIndex par = this->parent(index);
-//    DataWrapper* ptr2 = (DataWrapper*)par.internalPointer();
-//    qDebug() << ptr2->id;
-
-//    qDebug() << this->data(index, 0);
 
 }
 
@@ -196,19 +157,65 @@ void ImageProvider::fetchMore(const QModelIndex &parent) {
     fetchAll(parent);
 }
 
-bool ImageProvider::canFetchMore(const QModelIndex &parent) {
+bool ImageProvider::canFetchMore(const QModelIndex &parent) const {
     const DataWrapper* ptr = dataForIndex(parent);
-    return (ptr->childrenCount > 0);
+    return (ptr->children.size() < ptr->childrenCount);
 }
 
+////////////////////////////////////////////////
+
 void ImageProvider::addSemester(qint64 semesterNumber) {
+
+    if (root.childrenCount >= semesterNumber) {
+        return;
+    }
+
     QSqlQuery query;
     query.prepare("INSERT INTO IMAGES (pid, number, path, comment, tags, type) VALUES (:pid, :number, :path, :comment, :tags, :type)" );
     query.bindValue(":pid", root.id);
     query.bindValue(":number", semesterNumber);
-    query.bindValue(":path", "NO_PATH");s
+    query.bindValue(":path", "NO_PATH");
     query.bindValue(":comment", QString::number(semesterNumber) + " semester");
     query.bindValue(":tags", "NO_TAGS");
     query.bindValue(":type", "semester");
     query.exec();
+}
+
+void ImageProvider::addCourse(qint64 semesterNumber, QString courseName) {
+
+    if (root.childrenCount < semesterNumber) {
+        qDebug() << root.childrenCount;
+        this->addSemester(semesterNumber);
+    }
+
+    QSqlQuery query;
+    query.prepare("INSERT INTO IMAGES (pid, number, path, comment, tags, type) VALUES (:pid, :number, :path, :comment, :tags, :type)" );
+    query.bindValue(":pid", root.children[semesterNumber-1]->id);
+    query.bindValue(":number", root.children[semesterNumber-1]->childrenCount + 1);
+    query.bindValue(":path", "NO_PATH");
+    query.bindValue(":comment", courseName);
+    query.bindValue(":tags", courseName);
+    query.bindValue(":type", "course");
+    qDebug() << query.exec();
+}
+
+void ImageProvider::deleteSemester(qint64 semesterNumber) {
+
+    if (root.childrenCount < semesterNumber) {
+        return;
+    }
+
+    QSqlQuery query;
+    query.prepare("DELETE FROM IMAGES WHERE id = :id" );
+    query.bindValue(":id", root.children[semesterNumber-1]->id);
+    query.exec();
+}
+
+qint64 ImageProvider::getChildrenCount(qint64 id) {
+    QSqlQuery query;
+    query.prepare("SELECT COUNT(*) FROM IMAGES WHERE pid = :id" );
+    query.bindValue(":id", id);
+    query.exec();
+    query.next();
+    return query.value(0).toInt();
 }

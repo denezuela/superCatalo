@@ -50,11 +50,12 @@ class ImageProvider : public QAbstractItemModel
         const DataWrapper* dataForIndex(const QModelIndex &parent) const;
         DataWrapper* dataForIndex(const QModelIndex &parent);
         void fetchMore(const QModelIndex &parent);
-        bool canFetchMore(const QModelIndex &parent);
+        bool canFetchMore(const QModelIndex &parent) const;
         void addSemester(qint64 semesterNumber);
         void addCourse(qint64 semesterNumber, QString courseName);
         void addImage(qint64 semesterNumber, QString courseName, QString imagePath);
-
+        void deleteSemester(qint64 semesterNumber);
+        qint64 getChildrenCount(qint64 id);
     signals:
 
     public slots:
