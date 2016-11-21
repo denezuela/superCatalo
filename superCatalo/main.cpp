@@ -16,11 +16,12 @@ int main(int argc, char *argv[])
     ImageProvider ip;
 
     //ip.addSemester(3);
-    //ip.deleteSemester(3);
-    //ip.addCourse(3, "Arch");
     QTreeView treeView;
     treeView.setModel(&ip);
+
     treeView.show();
+
+    ip.addCourse(3, "Abba");
 
     return app.exec();
 }
