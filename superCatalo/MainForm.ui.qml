@@ -6,20 +6,20 @@ Item {
     width: 640
     height: 480
 
-    property alias button1: button1
-    property alias button2: button2
-
-    RowLayout {
-        anchors.centerIn: parent
-
-        Button {
-            id: button1
-            text: qsTr("Press Me 1")
+    TreeView {
+        TableViewColumn {
+            title: "Semester";
+            width: 300;
         }
 
-        Button {
-            id: button2
-            text: qsTr("Press Me 2")
+        TableViewColumn {
+            title: "Course";
+            width: 300;
+        }
+
+        TableViewColumn {
+            title: "Lecture";
+            width: 300;
         }
     }
 }

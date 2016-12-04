@@ -1,40 +1,53 @@
 import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
+import QtQml.Models 2.2
 
 ApplicationWindow {
     visible: true
     width: 640
     height: 480
-    title: qsTr("Hello World")
+    title: qsTr("Super Catalo")
 
     menuBar: MenuBar {
         Menu {
-            title: qsTr("File")
+            title: qsTr("Add...")
             MenuItem {
-                text: qsTr("&Open")
-                onTriggered: console.log("Open action triggered");
+                text: qsTr("Semester...")
+                onTriggered: console.log("Semester");
             }
             MenuItem {
-                text: qsTr("Exit")
-                onTriggered: Qt.quit();
+                text: qsTr("Course...")
+                onTriggered: console.log("Course");
+            }
+            MenuItem {
+                text: qsTr("Lecture...")
+                onTriggered: console.log("Lecture");
             }
         }
     }
 
-    MainForm {
-        anchors.fill: parent
-        button1.onClicked: messageDialog.show(qsTr("Button 1 pressed"))
-        button2.onClicked: messageDialog.show(qsTr("Button 2 pressed"))
-    }
+    TreeView {
+        width: 640; height: 480
+        model: ip
 
-    MessageDialog {
-        id: messageDialog
-        title: qsTr("May I have your attention, please?")
-
-        function show(caption) {
-            messageDialog.text = caption;
-            messageDialog.open();
+        TableViewColumn {
+            title: "Semester";
+            width: 100;
+            role: DisplayRole
         }
+
+        TableViewColumn {
+            title: "Course";
+            width: 100;
+            role: DisplayRole
+        }
+
+        TableViewColumn {
+            title: "Lecture";
+            width: 100;
+            role: DisplayRole
+        }
+
     }
 }
