@@ -1,10 +1,9 @@
 import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
-
-
 import QtQuick.Layouts 1.1
-import QtQuick.Controls 1.2
+
+
 
 ApplicationWindow {
     id: window
@@ -13,13 +12,13 @@ ApplicationWindow {
     height: 480
 
     TreeView {
+      anchors.fill: parent;
       model: myModel
       TableViewColumn{
-           title: "Name"
+           title: "Course"
+           role: "display"
            width:500
-
        }
-
 
 
 }
