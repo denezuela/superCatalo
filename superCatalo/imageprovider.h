@@ -70,6 +70,7 @@ class ImageProvider : public QAbstractItemModel
         void addImage(qint64 semesterNumber, QString courseName, QString path, QString comments, QStringList tags = {});
         void addSemester(qint64 semesterNumber);
         void addCourse(qint64 semesterNumber, QString courseName);
+        bool hasChildren(const QModelIndex &parent) const;
 
     signals:
 

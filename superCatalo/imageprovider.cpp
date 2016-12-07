@@ -97,7 +97,7 @@ void ImageProvider::fetchAll(const QModelIndex &parent) {
     query.prepare("SELECT * FROM IMAGES WHERE PID=:id ORDER BY number");
     query.bindValue(":id", parentDataWrapper->id);
     query.exec();
-
+    beginInsertRows(parent,0,parentDataWrapper->childrenCount-1);
     while(query.next()) {
       DataWrapper* childWrapper = new DataWrapper;
       dbData* childData = new dbData;
@@ -127,6 +127,7 @@ void ImageProvider::fetchAll(const QModelIndex &parent) {
 
       parentDataWrapper->children.append(childWrapper);
     }
+     endInsertRows();
 }
 
 ImageProvider::~ImageProvider() {
@@ -481,5 +482,11 @@ DataWrapper* ImageProvider::findFromName (QList<DataWrapper*> children, QString 
 
     qDebug()<<"Bad";
     return nullptr;
+}
+
+bool ImageProvider::hasChildren(const QModelIndex &parent) const
+{
+    const DataWrapper* ptr = dataForIndex(parent);
+    return ptr->childrenCount!=0;
 }
 
