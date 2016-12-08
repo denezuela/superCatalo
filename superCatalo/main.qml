@@ -28,25 +28,15 @@ ApplicationWindow {
     }
 
     TreeView {
+        anchors.fill: parent
+        id: window
         width: 640; height: 480
         model: ip
 
         TableViewColumn {
-            title: "Semester";
-            width: 100;
-            role: DisplayRole
-        }
-
-        TableViewColumn {
-            title: "Course";
-            width: 100;
-            role: DisplayRole
-        }
-
-        TableViewColumn {
-            title: "Lecture";
-            width: 100;
-            role: DisplayRole
+            title: "Semester -> Course -> Lecture";
+            width: 600;
+            role: "display"
         }
 
     }

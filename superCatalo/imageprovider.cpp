@@ -7,7 +7,7 @@ ImageProvider::ImageProvider(QAbstractItemModel *parent) : QAbstractItemModel(pa
 {
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setHostName("localhost");
-    db.setDatabaseName("/home/skt/sqlite/db");
+    db.setDatabaseName("/home/skt/sqlite/database");
     bool db_ok = db.open();
     if (!db_ok) {
         qDebug() << "Database error";
@@ -39,6 +39,10 @@ QModelIndex ImageProvider::index(int row, int column, const QModelIndex &parent)
     if (column != 0)
         return QModelIndex();
 
+    if (!hasIndex(row, column, parent)) {
+        return {};
+    }
+
     if (!parent.isValid())
         return createIndex(row, column, root.children[row]);
 
@@ -47,8 +51,8 @@ QModelIndex ImageProvider::index(int row, int column, const QModelIndex &parent)
     if (ptr->type == IMAGE)
         return QModelIndex();
 
-    if (ptr->children.size() <= row)
-        return QModelIndex();
+//    if (ptr->children.size() <= row)
+//        return QModelIndex();
 
     DataWrapper* dataWrapperForIndex = ptr->children[row];
     QModelIndex result = createIndex(row, column, dataWrapperForIndex);
@@ -62,7 +66,7 @@ int ImageProvider::rowCount(const QModelIndex &index) const {
     }
 
     const DataWrapper* ptr = dataForIndex(index);
-    return ptr->childrenCount;
+    return ptr->children.count();
 }
 
 int ImageProvider::columnCount(const QModelIndex &index) const {
@@ -85,7 +89,7 @@ QModelIndex ImageProvider::parent(const QModelIndex &index) const {
         return QModelIndex();
     }
 
-    return createIndex(ptr->parent_pointer->number, 0, static_cast<void*>(ptr->parent_pointer));
+    return createIndex(ptr->parent_pointer->number - 1, 0, static_cast<void*>(ptr->parent_pointer));
 }
 
 void ImageProvider::fetchAll(const QModelIndex &parent) {
@@ -132,7 +136,7 @@ void ImageProvider::fetchAll(const QModelIndex &parent) {
 
 ImageProvider::~ImageProvider() {
     db.close();
-    delete &root;
+   // delete &root;
 }
 
 const DataWrapper* ImageProvider::dataForIndex(const QModelIndex &index) const {
