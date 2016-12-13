@@ -5,6 +5,7 @@
 #include <QImage>
 #include <QPixmap>
 #include <QUrl>
+#include <QSize>
 
 ImageProvider::ImageProvider(QAbstractItemModel *parent) : QAbstractItemModel(parent)
 {
@@ -36,7 +37,6 @@ QVariant ImageProvider::data (const QModelIndex &index, int role) const {
         switch (ptr->type) {
             case SEMESTER:
             case COURSE: {
-                qDebug() << ptr->data->type;
                 return ptr->data->comments;
                 break;
             }
@@ -52,8 +52,12 @@ QVariant ImageProvider::data (const QModelIndex &index, int role) const {
         if (ptr->type == IMAGE) {
             QImage image(ptr->data->path);
             if (!image.isNull()) {
+
+                QSize size (100, 100);
                 QPixmap pixmap = QPixmap::fromImage(image);
-                return pixmap;
+                QPixmap result = pixmap.scaled(size, Qt::KeepAspectRatio);
+
+                return result;
             }
             else {
                 qDebug() << ptr->data->path <<"Image is null";
