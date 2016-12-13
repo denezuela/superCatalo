@@ -17,13 +17,13 @@ int main(int argc, char *argv[])
 
     ImageProvider ip;
 
-    //ip.addImage(3909, "op", "./3200", "LECT1");
-//    QTreeView treeView;
-//    treeView.setModel(&ip);
-//    treeView.show();
+//    ip.addImage(3909, "op", "./3200", "LECT1");
+    QTreeView treeView;
+    treeView.setModel(&ip);
+    treeView.show();
 
-    engine.rootContext()->setContextProperty("ip", &ip);
-    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+//    engine.rootContext()->setContextProperty("ip", &ip);
+//    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
     return app.exec();
 }

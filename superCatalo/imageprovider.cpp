@@ -2,6 +2,9 @@
 #include <QDebug>
 #include <QSqlQuery>
 #include <QModelIndex>
+#include <QImage>
+#include <QPixmap>
+#include <QUrl>
 
 ImageProvider::ImageProvider(QAbstractItemModel *parent) : QAbstractItemModel(parent)
 {
@@ -26,12 +29,39 @@ QVariant ImageProvider::data (const QModelIndex &index, int role) const {
     if (!index.isValid())
         return {};
 
+    const DataWrapper* ptr = dataForIndex(index);
+
     if (role == Qt::DisplayRole) {
-        const DataWrapper* ptr = dataForIndex(index);
+
+        switch (ptr->type) {
+            case SEMESTER:
+            case COURSE: {
+                qDebug() << ptr->data->type;
+                return ptr->data->comments;
+                break;
+            }
+            default:
+                break;
+        }
+
         return ptr->data->comments;
     }
-    else
-        return QVariant();
+
+    if (role == Qt::DecorationRole) {
+
+        if (ptr->type == IMAGE) {
+            QImage image(ptr->data->path);
+            if (!image.isNull()) {
+                QPixmap pixmap = QPixmap::fromImage(image);
+                return pixmap;
+            }
+            else {
+                qDebug() << ptr->data->path <<"Image is null";
+            }
+        }
+    }
+
+    return QVariant();
 }
 
 QModelIndex ImageProvider::index(int row, int column, const QModelIndex &parent) const {
@@ -126,7 +156,7 @@ void ImageProvider::fetchAll(const QModelIndex &parent) {
         childWrapper->type = SEMESTER;
       else if (childData->type == "course")
         childWrapper->type = COURSE;
-      else
+      else if (childData->type == "image")
         childWrapper->type = IMAGE;
 
       parentDataWrapper->children.append(childWrapper);
