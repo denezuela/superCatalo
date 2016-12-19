@@ -2,11 +2,7 @@ TEMPLATE = app
 
 QT += qml quick widgets
 
-
 QT += sql
-
-#QT += declarative
-#QT += core gui declarative
 
 CONFIG += c++11
 

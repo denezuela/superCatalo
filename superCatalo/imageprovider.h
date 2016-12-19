@@ -19,6 +19,7 @@ struct dbData{
     QStringList tags;
     QString type;
 };
+Q_DECLARE_METATYPE(dbData)
 
 struct DataWrapper {
     qint64 id;
@@ -33,12 +34,17 @@ struct DataWrapper {
 class ImageProvider : public QAbstractItemModel
 {
     Q_OBJECT
-   private:
+    //Q_PROPERTY(DataWrapper data MEMBER root)
+
+    private:
         QSqlDatabase db;
         DataWrapper root{0, ROOT, nullptr, 0, nullptr, {}, 0};
-        bool contains (QList<DataWrapper*> children, qint64 number);
-        bool contains (QList<DataWrapper*> children, QString comments);
+        bool containsSemesterAlready (QList<DataWrapper*> children, qint64 number);
+        bool containsCourseAlready (QList<DataWrapper*> children, QString comments);
+        bool containsPathAlready (QList<DataWrapper*> children, QString path);
         DataWrapper* findFromNumber (QList<DataWrapper*> children, qint64 number);
+        DataWrapper* findFromName (QList<DataWrapper*> children, QString name);
+
 
     public:
         ImageProvider(QAbstractItemModel *parent = 0);
@@ -59,12 +65,13 @@ class ImageProvider : public QAbstractItemModel
         virtual bool insertRows(int row, int count, const QModelIndex &parent);
         void setDataSemester(qint64 semesterNumber);
         void setDataCourse(const QModelIndex &parent, QString courseName);
+        void setDataImage(const QModelIndex &parent, QString path, QString comments, QStringList tags={});
 
-        void addImage(qint64 semesterNumber, QString courseName, QString imagePath);
-        void deleteSemester(qint64 semesterNumber);
+Q_INVOKABLE  void addImage(qint64 semesterNumber, QString courseName, QString path, QString comments, QStringList tags = {});
+Q_INVOKABLE  void addSemester(qint64 semesterNumber);
+Q_INVOKABLE  void addCourse(qint64 semesterNumber, QString courseName);
+        bool hasChildren(const QModelIndex &parent) const;
 
-        void addSemester(qint64 semesterNumber);
-        void addCourse(qint64 semesterNumber, QString courseName);
     signals:
 
     public slots:

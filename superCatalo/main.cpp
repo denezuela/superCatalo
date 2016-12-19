@@ -1,33 +1,36 @@
 #include <QApplication>
-#include <QQmlEngine>
-#include <QQmlComponent>
-#include <QQmlContext>
 #include <QQmlApplicationEngine>
 #include <QTreeView>
 #include <QDebug>
 #include <QModelIndex>
+#include <QQmlContext>
+#include <QQmlComponent>
+#include <QItemSelectionModel>
 #include "imageprovider.h"
 
 int main(int argc, char *argv[])
 {
+
     QApplication app(argc, argv);
+
+    QQmlApplicationEngine engine;
 
     ImageProvider ip;
 
-//    QTreeView treeView; //создание объекта класса treeview
-//    treeView.setModel(&ip); //установить соответствующую модель
+
+
+//      ip.addSemester(5);
+//      ip.addCourse(5,"Вектан");
+//      ip.addCourse(5,"Финмат");
+//      ip.addImage(5,"Вектан","../vect","comments");
+//      ip.addImage(5,"Финмат","../finmat","comments");
+
+//    QTreeView treeView;
+//    treeView.setModel(&ip);
 //    treeView.show();
 
-    QQmlEngine engine;
-    engine.rootContext()->setContextProperty("myModel", &ip);
-    QQmlComponent component(&engine, QUrl("qrc:/main.qml"));
-    component.create();
-
+    engine.rootContext()->setContextProperty("mymodel", &ip);
+    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
     return app.exec();
 }
-    //ip.addSemester(3);
-    //ip.addCourse(3, "Abba");
-
-
-
