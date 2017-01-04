@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 
     ImageProvider ip;
 
-//    ip.addImage(3909, "op", "./3200", "LECT1");
+    ip.addImage(15, "OS", "./22", "LECT2");
     QTreeView treeView;
     treeView.setModel(&ip);
     treeView.show();
