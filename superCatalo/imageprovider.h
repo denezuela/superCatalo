@@ -34,7 +34,6 @@ struct DataWrapper {
 class ImageProvider : public QAbstractItemModel
 {
     Q_OBJECT
-    //Q_PROPERTY(DataWrapper data MEMBER root)
 
     private:
         QSqlDatabase db;
@@ -44,7 +43,6 @@ class ImageProvider : public QAbstractItemModel
         bool containsPathAlready (QList<DataWrapper*> children, QString path);
         DataWrapper* findFromNumber (QList<DataWrapper*> children, qint64 number);
         DataWrapper* findFromName (QList<DataWrapper*> children, QString name);
-
 
     public:
         ImageProvider(QAbstractItemModel *parent = 0);

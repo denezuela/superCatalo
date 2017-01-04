@@ -17,8 +17,6 @@ int main(int argc, char *argv[])
 
     ImageProvider ip;
 
-
-
 //      ip.addSemester(5);
 //      ip.addCourse(5,"Вектан");
 //      ip.addCourse(5,"Финмат");
