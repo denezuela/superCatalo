@@ -52,11 +52,6 @@ QVariant ImageProvider::data (const QModelIndex &index, int role) const {
         if (ptr->type == IMAGE) {
             QImage image(ptr->data->path);
             if (!image.isNull()) {
-                //QSize size (100, 100);
-                //QPixmap pixmap = QPixmap::fromImage(image);
-                //QPixmap result = pixmap.scaled(size, Qt::KeepAspectRatio);
-
-                //return result;
                 return QUrl::fromLocalFile(ptr->data->path);
             }
             else {
@@ -201,15 +196,6 @@ qint64 ImageProvider::getChildrenCount(qint64 id) {
     query.next();
     return query.value(0).toInt();
 }
-
-
-//
-//
-//
-//
-//
-//
-//
 
 
 bool ImageProvider::setData(const QModelIndex &index, const QVariant &value, int role) {
@@ -539,7 +525,7 @@ DataWrapper* ImageProvider::findFromName (QList<DataWrapper*> children, QString 
             return *it;
     }
 
-    qDebug()<<"Bad";
+    qDebug()<<"Bad things happened";
     return nullptr;
 }
 
