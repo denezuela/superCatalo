@@ -45,7 +45,7 @@ class ImageProvider : public QAbstractItemModel
         DataWrapper* findFromNumber (QList<DataWrapper*> children, qint64 number);
         DataWrapper* findFromName (QList<DataWrapper*> children, QString name);
         DataWrapper* findFromPath (QList<DataWrapper*> children, QString path);
-        void recountRowNumbers(QList<DataWrapper*> &children);
+        void recountRowNumbers(QList<DataWrapper*> children);
 
     public:
         ImageProvider(QAbstractItemModel *parent = 0);

@@ -80,7 +80,6 @@ QModelIndex ImageProvider::index(int row, int column, const QModelIndex &parent)
     if (ptr->type == IMAGE)
         return QModelIndex();
 
-
     DataWrapper* dataWrapperForIndex = ptr->children[row];
     QModelIndex result = createIndex(row, column, dataWrapperForIndex);
     return result;
@@ -207,16 +206,13 @@ bool ImageProvider::setData(const QModelIndex &index, const QVariant &value, int
 
     if (role == Qt::EditRole) {
         if (ptr->type == SEMESTER) {
-            qDebug() << "Add semester";
             setDataSemester(value.toInt());
         }
         if (ptr->type == COURSE) {
-            qDebug() << "Add course";
             QModelIndex parent = createIndex(ptr->parent_pointer->number, 0, ptr->parent_pointer);
             setDataCourse(parent, value.toString());
         }
         if (ptr->type == IMAGE) {
-            qDebug() << "Add image";
             dbData data = value.value<dbData>();
             QModelIndex parent = createIndex(ptr->parent_pointer->number, 0, ptr->parent_pointer);
             setDataImage(parent, data.path, data.comments, data.tags);
@@ -351,7 +347,6 @@ void ImageProvider::setDataCourse(const QModelIndex &parent, QString courseName)
     queryForSelect.next();
 
     qint64 id = queryForSelect.value(0).toInt();
-    qDebug() << "addCourseId" << id;
 
     DataWrapper* childWrapper = ptr->children[ptr->children.size()-1];
     childWrapper->id = id;
@@ -374,7 +369,7 @@ void ImageProvider::addCourse(qint64 semesterNumber, QString courseName) {
     }
 
     DataWrapper* semesterPtr = this->findFromNumber(root.children, semesterNumber);
-    QModelIndex semesterIndex = createIndex(semesterPtr->row, 0, semesterPtr);
+    QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
     this->fetchMore(semesterIndex);
     if (containsCourseAlready(semesterPtr->children, courseName)) {
         qDebug() << "contains course already";
@@ -416,7 +411,6 @@ void ImageProvider::setDataImage(const QModelIndex &parent, QString path, QStrin
     queryForSelect.next();
 
     qint64 id = queryForSelect.value(0).toInt();
-    qDebug() << "addImageId" << id;
 
     DataWrapper* childWrapper = ptr->children[ptr->children.size()-1];
     childWrapper->id = id;
@@ -439,7 +433,7 @@ void ImageProvider::addImage(qint64 semesterNumber, QString courseName, QString 
     }
 
     DataWrapper* semesterPtr = this->findFromNumber(root.children, semesterNumber);
-    QModelIndex semesterIndex = createIndex(semesterPtr->row, 0, semesterPtr);
+    QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
     this->fetchMore(semesterIndex);
     if (!containsCourseAlready(semesterPtr->children, courseName)) {
         qDebug() << "not contains course";
@@ -447,7 +441,7 @@ void ImageProvider::addImage(qint64 semesterNumber, QString courseName, QString 
     }
 
     DataWrapper* coursePtr = this->findFromName(semesterPtr->children, courseName);
-    QModelIndex courseIndex = createIndex(coursePtr->row, 0, coursePtr);
+    QModelIndex courseIndex = index(coursePtr->row, 0, semesterIndex);
     this->fetchMore(courseIndex);
     if (containsPathAlready(coursePtr->children, path)) {
         qDebug() << "contains image already";
@@ -471,7 +465,7 @@ void ImageProvider::addImage(qint64 semesterNumber, QString courseName, QString 
 
 bool ImageProvider::removeRows(int row, int count, const QModelIndex &parent) {
 
-    qDebug() << "Remove rows";
+    qDebug() << "Remove rows" << count << "from" << row;
 
     DataWrapper* ptr;
     if (!parent.isValid())
@@ -479,38 +473,39 @@ bool ImageProvider::removeRows(int row, int count, const QModelIndex &parent) {
     else
         ptr = dataForIndex(parent);
 
-    this->beginRemoveRows(parent, row, row+count-1);
+   beginRemoveRows(parent, row, row+count-1);
 
-    DataWrapper* childWrapper;
-
-    for (int i = 0; i < count; ++i) {
+    for (qint64 i = 0; i < count; ++i) {
         ptr->children.removeAt(row);
-        ptr->childrenCount -= 1;
+        ptr->childrenCount--;
     }
 
-    this->recountRowNumbers(ptr->children);
+    for (qint64 i = 0; i < ptr->children.size(); ++i) {
+        ptr->children[i]->row = i;
+    }
 
-    this->endRemoveRows();
+    endRemoveRows();
 
     return true;
 }
 
 void ImageProvider::deleteImage(qint64 semesterNumber, QString courseName, QString path) {
+    qDebug() << "Delete image";
+
     DataWrapper* semesterPtr = findFromNumber(root.children, semesterNumber);
     if (semesterPtr == nullptr) {
         qDebug() << "No such semester";
         return;
     }
-    QModelIndex semesterIndex = createIndex(semesterPtr->row, 0, semesterPtr);
-    this->fetchMore(semesterIndex);
+//    QModelIndex rootIndex = createIndex(0, 0, &root);
+    QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
 
     DataWrapper* coursePtr = findFromName(semesterPtr->children, courseName);
     if (coursePtr == nullptr) {
         qDebug() << "No such course";
         return;
     }
-    QModelIndex courseIndex = createIndex(coursePtr->row, 0, coursePtr);
-    this->fetchMore(courseIndex);
+    QModelIndex courseIndex = index(coursePtr->row, 0, semesterIndex);
 
     DataWrapper* imagePtr = findFromPath(coursePtr->children, path);
     if (imagePtr == nullptr) {
@@ -521,56 +516,65 @@ void ImageProvider::deleteImage(qint64 semesterNumber, QString courseName, QStri
     removeDataFromDb(imagePtr->id);
 
     this->removeRows(imagePtr->row, 1, courseIndex);
-
-    QModelIndex imageIndex = createIndex(imagePtr->row, 0, imagePtr);
-    emit dataChanged(imageIndex, imageIndex);
 }
 
 void ImageProvider::deleteCourse(qint64 semesterNumber, QString courseName) {
+    qDebug() << "Delete course " << courseName;
+
     DataWrapper* semesterPtr = findFromNumber(root.children, semesterNumber);
     if (semesterPtr == nullptr) {
         qDebug() << "No such semester";
         return;
     }
-    QModelIndex semesterIndex = createIndex(semesterPtr->row, 0, semesterPtr);
-    this->fetchMore(semesterIndex);
+    //QModelIndex rootIndex = createIndex(0, 0, &root);
+    QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
 
     DataWrapper* coursePtr = findFromName(semesterPtr->children, courseName);
     if (coursePtr == nullptr) {
         qDebug() << "No such course";
         return;
     }
-    QModelIndex courseIndex = createIndex(coursePtr->row, 0, coursePtr);
-    this->fetchMore(courseIndex);
+    QModelIndex courseIndex = index(coursePtr->row, 0, semesterIndex);
 
-    for (auto it = coursePtr->children.begin(); it < coursePtr->children.end(); ++it)
-        deleteImage(semesterNumber, courseName, (*it)->data->path);
+    this->removeRows(0, coursePtr->childrenCount, courseIndex);
+    for (int i = 0; i < coursePtr->children.size(); ++i) {
+        removeDataFromDb(coursePtr->children[i]->id);
+    }
 
     removeDataFromDb(coursePtr->id);
     this->removeRows(coursePtr->row, 1, semesterIndex);
-
-    emit dataChanged(courseIndex, courseIndex);
 }
 
 void ImageProvider::deleteSemester(qint64 semesterNumber) {
+    qDebug() << "Delete semester " << semesterNumber;
+
     DataWrapper* semesterPtr = findFromNumber(root.children, semesterNumber);
     if (semesterPtr == nullptr) {
         qDebug() << "No such semester";
         return;
     }
-    QModelIndex semesterIndex = createIndex(semesterPtr->row, 0, semesterPtr);
-    this->fetchMore(semesterIndex);
+    qDebug() << "With row" << semesterPtr->row;
+    QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
 
-    for (int i = 0; i < semesterPtr->children.size(); ++i)
-        deleteCourse(semesterNumber, semesterPtr->children[i]->data->comments);
+    DataWrapper* coursePtr;
+    for (qint64 i = 0; i < semesterPtr->children.size(); ++i) {
+        coursePtr = semesterPtr->children[i];
+        QModelIndex courseIndex = index(coursePtr->row, 0, semesterIndex);
 
-//    for (auto it = semesterPtr->children.begin(); it < semesterPtr->children.end(); ++it)
-//        deleteCourse(semesterNumber, (*it)->data->comments);
+        this->removeRows(0, coursePtr->childrenCount, courseIndex);
+        for (qint64 j = 0; j < coursePtr->children.size(); ++j) {
+            removeDataFromDb(coursePtr->children[j]->id);
+        }
 
-    removeDataFromDb(semesterPtr->id);
+        removeDataFromDb(coursePtr->id);
+    }
+    this->removeRows(0, semesterPtr->childrenCount, semesterIndex);
+
     this->removeRows(semesterPtr->row, 1, QModelIndex());
+    removeDataFromDb(semesterPtr->id);
 
-    emit dataChanged(semesterIndex, semesterIndex);
+    beginResetModel();
+    endResetModel();
 }
 
 void ImageProvider::removeDataFromDb(qint64 id) {
@@ -578,6 +582,7 @@ void ImageProvider::removeDataFromDb(qint64 id) {
     queryForDelete.prepare("DELETE FROM IMAGES WHERE id = :id");
     queryForDelete.bindValue(":id", id);
     queryForDelete.exec();
+    queryForDelete.next();
 }
 
 //private functions
@@ -616,8 +621,9 @@ bool ImageProvider::containsPathAlready (QList<DataWrapper*> children, QString p
 }
 
 DataWrapper* ImageProvider::findFromNumber (QList<DataWrapper*> children, qint64 number) {
+    qDebug() << "findFromNumber " << number;
 
-    for (auto it = children.begin(); it < children.end(); ++it)
+    for (auto it = children.begin(); it != children.end(); ++it)
     {
         if ((*it)->number == number)
             return *it;
@@ -628,7 +634,7 @@ DataWrapper* ImageProvider::findFromNumber (QList<DataWrapper*> children, qint64
 
 DataWrapper* ImageProvider::findFromName (QList<DataWrapper*> children, QString name) {
 
-    for (auto it = children.begin(); it < children.end(); ++it)
+    for (auto it = children.begin(); it != children.end(); ++it)
     {
         if ((*it)->data->comments == name)
             return *it;
@@ -639,7 +645,7 @@ DataWrapper* ImageProvider::findFromName (QList<DataWrapper*> children, QString 
 
 DataWrapper* ImageProvider::findFromPath (QList<DataWrapper*> children, QString path) {
 
-    for (auto it = children.begin(); it < children.end(); ++it)
+    for (auto it = children.begin(); it != children.end(); ++it)
     {
         if ((*it)->data->path == path)
             return *it;
@@ -648,11 +654,12 @@ DataWrapper* ImageProvider::findFromPath (QList<DataWrapper*> children, QString 
     return nullptr;
 }
 
-void ImageProvider::recountRowNumbers(QList<DataWrapper*> &children) {\
-    qDebug() << "recountNumbers";
-    qint64 i = 0;
-    for (auto it = children.begin(); it < children.end(); ++it)
-        (*it)->row = i++;
+void ImageProvider::recountRowNumbers(QList<DataWrapper *> children) {
+    qDebug() << "recountRowNumbers";
+
+    for (qint64 i = 0; i < children.size(); ++i) {
+            children[i]->row = i;
+        }
 }
 
 bool ImageProvider::hasChildren(const QModelIndex &parent) const
