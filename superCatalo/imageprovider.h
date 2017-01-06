@@ -45,6 +45,7 @@ class ImageProvider : public QAbstractItemModel
         DataWrapper* findFromName (QList<DataWrapper*> children, QString name);
         DataWrapper* findFromPath (QList<DataWrapper*> children, QString path);
         void recountRowNumbers(QList<DataWrapper*> children);
+        void fetchMoreWithoutShowing(const QModelIndex &parent);
 
     public:
         ImageProvider(QAbstractItemModel *parent = 0);
@@ -78,7 +79,7 @@ Q_INVOKABLE  void addTheme(qint64 semesterNumber, QString courseName, QString th
 Q_INVOKABLE  void deleteImage(qint64 semesterNumber, QString courseName, QString themeName, QString path);
 Q_INVOKABLE  void deleteCourse(qint64 semesterNumber, QString courseName);
 Q_INVOKABLE  void deleteSemester(qint64 semesterNumber);
-//Q_INVOKABLE  void deleteTheme(qint64 semesterNumber, QString courseName, QString themeName);
+Q_INVOKABLE  void deleteTheme(qint64 semesterNumber, QString courseName, QString themeName);
 
         bool hasChildren(const QModelIndex &parent) const;
 
