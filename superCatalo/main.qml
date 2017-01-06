@@ -43,6 +43,11 @@ ApplicationWindow {
                 onTriggered: item_addcourse.visible=true
             }
             MenuItem {
+                id:addTheme
+                text: qsTr("&Добавить тему")
+                onTriggered: item_addtheme.visible=true
+            }
+            MenuItem {
                 id: addImage
                 text: qsTr("&Добавить изображение")
                 onTriggered: item_addimage.visible=true
@@ -57,6 +62,10 @@ ApplicationWindow {
             MenuItem {
                 text: qsTr("&Удалить предмет")
                 onTriggered: item_delcourse.visible=true
+            }
+            MenuItem {
+                text: qsTr("&Удалить тему")
+                onTriggered: item_deltheme.visible=true
             }
             MenuItem {
                 text: qsTr("&Удалить изображение")
@@ -133,6 +142,7 @@ ApplicationWindow {
                     {
                         image.source = mymodel.data(index_image,1);
                         slider_image.visible = true;
+                        slider_rotation.visible=true;
                     }
                 }
             }
@@ -144,6 +154,8 @@ ApplicationWindow {
         y: 42
         width: 394
         height: 392
+        rotation: slider_rotation.value*360
+        scale: slider_image.value
 
         MouseArea {
             // действуем в пределах всего элемента Image
@@ -158,6 +170,8 @@ ApplicationWindow {
 
     Slider {
         id: slider_rotation
+        x: 419
+        y: 17
         //anchors.left: button_turn.right
         anchors.leftMargin: 5
         width: 107
@@ -171,7 +185,9 @@ ApplicationWindow {
 
     Slider {
         id: slider_image
-        anchors.left: slider_rotation.right
+        x: 301
+        y: 17
+        //anchors.left: slider_rotation.right
         anchors.leftMargin: 5
         width: 107
         height: 27
@@ -272,6 +288,64 @@ ApplicationWindow {
     }
 
     Rectangle {
+        id: item_addtheme
+        x: 132
+        y: 136
+        width: 377
+        height: 208
+        visible: false
+        color: "#7bb8d1"
+        border.width: 1
+
+        Button {
+            id: button3_ok
+            x: 149
+            y: 169
+            text: qsTr("ОК")
+            onClicked: {
+                mymodel.addTheme(textField_numsemester3.text,textField_namecourse3.text,textField_nametheme3.text);
+                item_addtheme.visible=false;
+               }
+        }
+
+        Button {
+            id: button3_close
+            x: 336
+            y: 8
+            width: 28
+            height: 27
+            onClicked: item_addtheme.visible=false
+        }
+
+        TextField {
+            x: 64
+            y: 30
+            width: 250
+            height: 33
+            id: textField_numsemester3
+            placeholderText: qsTr("Введите номер семестра")
+        }
+        TextField {
+            x: 64
+            y: 80
+            width: 250
+            height: 33
+            id: textField_namecourse3
+            placeholderText: qsTr("Введите название предмета")
+        }
+
+        TextField {
+            x: 64
+            y: 130
+            width: 250
+            height: 33
+            id: textField_nametheme3
+            placeholderText: qsTr("Введите название темы")
+        }
+
+    }
+
+    Rectangle {
         id: item_addimage
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
@@ -300,7 +374,7 @@ ApplicationWindow {
         }
 
         Button {
-            id: button3_ok
+            id: button4_ok
             x: 161
             y: 229
             text: qsTr("ОК")
@@ -311,7 +385,7 @@ ApplicationWindow {
         }
 
         TextField {
-            id: textField_numsemester3
+            id: textField_numsemester4
             x: 76
             y: 18
             width: 250
@@ -319,7 +393,7 @@ ApplicationWindow {
             placeholderText: qsTr("Введите номер семестра")
         }
         Button {
-            id: button3_close
+            id: button4_close
             x: 367
             y: 8
             width: 27
@@ -329,7 +403,7 @@ ApplicationWindow {
         }
 
         TextField {
-            id: textField_namecourse3
+            id: textField_namecourse4
             x: 76
             y: 70
             width: 250
@@ -450,6 +524,64 @@ ApplicationWindow {
 
     }
 
+    Rectangle {
+        id: item_deltheme
+        x: 132
+        y: 136
+        width: 377
+        height: 208
+        visible: false
+        color: "#7bb8d1"
+        border.width: 1
+
+        Button {
+            id: button33_ok
+            x: 149
+            y: 169
+            text: qsTr("ОК")
+            onClicked: {
+                mymodel.deleteTheme(textField_numsemester3.text,textField_namecourse3.text,textField_nametheme3.text);
+                item_deltheme.visible=false;
+               }
+        }
+
+        Button {
+            id: button33_close
+            x: 341
+            y: 8
+            width: 28
+            height: 27
+            onClicked: item_deltheme.visible=false
+        }
+
+
+        TextField {
+            x: 64
+            y: 30
+            width: 250
+            height: 33
+            id: textField_numsemester33
+            placeholderText: qsTr("Введите номер семестра")
+        }
+        TextField {
+            x: 64
+            y: 80
+            width: 250
+            height: 33
+            id: textField_namecourse33
+            placeholderText: qsTr("Введите название предмета")
+        }
+
+        TextField {
+            x: 64
+            y: 130
+            width: 250
+            height: 33
+            id: textField_nametheme33
+            placeholderText: qsTr("Введите название темы")
+        }
+
+    }
 
 }
 

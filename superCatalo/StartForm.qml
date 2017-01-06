@@ -50,17 +50,17 @@ Item {
         }  
       }
 
-    Button {
-        id:button_rotation
-        x: 19
-        y: 13
-        width: 28
-        height: 27
-        text:"Поворот"
-        style: buttonStyle
-        onClicked: { image.rotation +=90 }
+//    Button {
+//        id:button_rotation
+//        x: 19
+//        y: 13
+//        width: 28
+//        height: 27
+//        text:"Поворот"
+//        style: buttonStyle
+//        onClicked: { image.rotation +=90 }
 
-    }
+//    }
 
 //    Button {
 //        id:button_delete
