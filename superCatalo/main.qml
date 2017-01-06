@@ -155,7 +155,7 @@ ApplicationWindow {
         width: 394
         height: 392
         rotation: slider_rotation.value*360
-        scale: slider_image.value
+        //scale: slider_image.value
 
         MouseArea {
             // действуем в пределах всего элемента Image
@@ -433,7 +433,6 @@ ApplicationWindow {
         }
     }
 
-
     Rectangle {
         id: item_delsemester
         x: 132
@@ -475,6 +474,7 @@ ApplicationWindow {
             placeholderText: qsTr("Введите номер семестра")
         }
     }
+
     Rectangle {
         id: item_delcourse
         x: 132
