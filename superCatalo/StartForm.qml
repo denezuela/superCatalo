@@ -51,33 +51,33 @@ Item {
       }
 
     Button {
-        id:button_add
+        id:button_rotation
         x: 19
         y: 13
         width: 28
         height: 27
-        text:"->"
+        text:"Поворот"
         style: buttonStyle
         onClicked: { image.rotation +=90 }
 
     }
 
-    Button {
-        id:button_delete
-        x: 62
-        y: 13
-        width: 28
-        height: 27
-        //Надо привязать положение кнопки к родителю!
-        //text:"-"
-        style: buttonStyle
-        Image {
-            source: "images/delete.svg"
-            antialiasing: true
-            anchors.fill: parent
-            z:2
-        }
-    }
+//    Button {
+//        id:button_delete
+//        x: 62
+//        y: 13
+//        width: 28
+//        height: 27
+//        //Надо привязать положение кнопки к родителю!
+//        //text:"-"
+//        style: buttonStyle
+//        Image {
+//            source: "images/delete.svg"
+//            antialiasing: true
+//            anchors.fill: parent
+//            z:2
+//        }
+//    }
 
 //    Button {
 //        id: button_cut

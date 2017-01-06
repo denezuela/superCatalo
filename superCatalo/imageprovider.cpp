@@ -11,7 +11,7 @@ ImageProvider::ImageProvider(QAbstractItemModel *parent) : QAbstractItemModel(pa
 {
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setHostName("localhost");
-    db.setDatabaseName("/home/skt/sqlite/database");
+    db.setDatabaseName("/home/skt/sqlite/db");
     bool db_ok = db.open();
     if (!db_ok) {
         qDebug() << "Database error";
@@ -667,4 +667,5 @@ bool ImageProvider::hasChildren(const QModelIndex &parent) const
     const DataWrapper* ptr = dataForIndex(parent);
     return ptr->childrenCount!=0;
 }
+
 

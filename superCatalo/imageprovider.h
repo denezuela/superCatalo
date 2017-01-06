@@ -7,6 +7,8 @@
 #include <QString>
 #include <QList>
 #include <QStringList>
+#include <QModelIndex>
+
 
 enum dataType {ROOT, SEMESTER, COURSE, IMAGE};
 
@@ -77,6 +79,12 @@ Q_INVOKABLE  void addCourse(qint64 semesterNumber, QString courseName);
 Q_INVOKABLE  void deleteImage(qint64 semesterNumber, QString courseName, QString path);
 Q_INVOKABLE  void deleteCourse(qint64 semesterNumber, QString courseName);
 Q_INVOKABLE  void deleteSemester(qint64 semesterNumber);
+
+
+
+
+
+
         bool hasChildren(const QModelIndex &parent) const;
 
     signals:

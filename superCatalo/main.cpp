@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 //    ip.addImage(16,"Вектан","../vect","comments");
 //    ip.addImage(16,"Финмат","../finmat","comments");
 //    ip.deleteImage(16,"Вектан","../vect");
-//    //ip.deleteCourse(16,"Финмат");
+//    ip.deleteCourse(16,"Финмат");
 //    ip.addSemester(4);
     //ip.deleteSemester(15);
 

@@ -30,26 +30,64 @@ ApplicationWindow {
 
     menuBar: MenuBar {
         Menu {
+            id: menu_a
             title: qsTr("Добавить")
             MenuItem {
+                id:addSemester
                 text: qsTr("&Добавить семестр")
-                onTriggered: item_term.visible=true
+                onTriggered: item_addsemester.visible=true
             }
             MenuItem {
+                id:addCourse
                 text: qsTr("&Добавить предмет")
-                onTriggered: item_subject.visible=true
+                onTriggered: item_addcourse.visible=true
             }
-            /*MenuItem {
-                text: qsTr("&Добавить тему")
-                onTriggered: item_theme.visible=true
-            }*/
             MenuItem {
+                id: addImage
                 text: qsTr("&Добавить изображение")
-                onTriggered: item_image.visible=true
+                onTriggered: item_addimage.visible=true
             }
         }
-    }
+        Menu {
+            title: qsTr("Удалить")
+            MenuItem {
+                text: qsTr("&Удалить семестр")
+                onTriggered: item_delsemester.visible=true
+            }
+            MenuItem {
+                text: qsTr("&Удалить предмет")
+                onTriggered: item_delcourse.visible=true
+            }
+            MenuItem {
+                text: qsTr("&Удалить изображение")
+                onTriggered: item_delimage.visible=true
+            }
+        }
 
+        Menu {
+            title: qsTr("Обработка")
+            MenuItem {
+                text: qsTr("&Оттенки серого")
+            }
+            MenuItem {
+                text: qsTr("&Размытие по Гаусу")
+            }
+            MenuItem {
+                text: qsTr("&Деление")
+
+            }
+        }
+        Menu {
+            title: qsTr("Печать")
+            MenuItem {
+                text: qsTr("&Печать изображения")
+            }
+            MenuItem {
+                text: qsTr("&Печать со свойствами") //печать нужных тем,номер изобр. на странице
+            }
+
+        }
+    }
 
     TreeView {
             id: treeView
@@ -68,20 +106,44 @@ ApplicationWindow {
                         title:"Структура"
                         role: "display"
                         width:300 //появляется прокрутка
-
             }
-            onDoubleClicked: {
-                if(mymodel.data(index,1)){
-                    image.source=mymodel.data(index,1);}
+            MouseArea {
+                id: mouseArea_tree
+                anchors.bottomMargin: 21
+                anchors.fill: parent
+                acceptedButtons: Qt.RightButton | Qt.LeftButton
+                onClicked:
+                {
+                    if (mouse.button === Qt.LeftButton)
+                    {
+                        var index_1 = parent.indexAt(mouse.x, mouse.y);
+                        if (index_1.valid)
+                        { parent.isExpanded(index_1) ? parent.collapse(index_1) : parent.expand(index_1);}
+                    }
+                    if (mouse.button === Qt.RightButton)
+                    {
+                        var index_2 = parent.indexAt(mouse.x, mouse.y);
+                        if (index_2.valid) menu_a.popup();
+                }
+                }
+                onDoubleClicked:
+                {
+                    var index_image = parent.indexAt(mouse.x, mouse.y);
+                    if(mymodel.data(index_image,1))
+                    {
+                        image.source = mymodel.data(index_image,1);
+                        slider_image.visible = true;
+                    }
+                }
             }
         }
 
     Image {
         id: image
-        x: 207
+        x: 211
         y: 42
         width: 394
-        height: 381
+        height: 392
 
         MouseArea {
             // действуем в пределах всего элемента Image
@@ -94,8 +156,32 @@ ApplicationWindow {
         }
     }
 
+    Slider {
+        id: slider_rotation
+        //anchors.left: button_turn.right
+        anchors.leftMargin: 5
+        width: 107
+        height: 27
+        stepSize: 0.001
+        visible: false
+        onEnabledChanged: {
+            image.rotation = slider_rotation.value;
+        }
+    }
+
+    Slider {
+        id: slider_image
+        anchors.left: slider_rotation.right
+        anchors.leftMargin: 5
+        width: 107
+        height: 27
+        value: 0.5
+        maximumValue: 1
+        visible: false
+    }
+
     Rectangle {
-        id: item_term
+        id: item_addsemester
         x: 132
         y: 160
         width: 377
@@ -105,25 +191,25 @@ ApplicationWindow {
         border.width: 1
 
         Button {
-            id: button_ok
+            id: button1_ok
             x: 151
             y: 82
             text: qsTr("ОК")
             onClicked: {
-                mymodel.addSemester(textField_term.text);
-                item_term.visible=false;
+                mymodel.addSemester(textField_numsemester1.text);
+                item_addsemester.visible=false;
                }
         }
 
         Button {
-            id: button_close
+            id: button1_close
             x: 348
             y: 1
             width: 28
             height: 27
             iconSource: "images/close.png"
             //iconSource: "close.png"
-            onClicked: item_term.visible=false
+            onClicked: item_semester.visible=false
         }
 
         TextField {
@@ -131,64 +217,240 @@ ApplicationWindow {
             y: 31
             width: 250
             height: 33
-            id: textField_term
+            id: textField_numsemester1
             placeholderText: qsTr("Введите номер семестра")
         }
     }
 
-   /* Rectangle {
-        id: item_subject
-        x: 109
-        y: 121
-        width: 429
-        height: 238
+    Rectangle {
+        id: item_addcourse
+        x: 132
+        y: 160
+        width: 377
+        height: 184
         visible: false
         color: "#7bb8d1"
         border.width: 1
 
-     TextField {
+        Button {
+            id: button2_ok
+            x: 149
+            y: 130
+            text: qsTr("ОК")
+            onClicked: {
+                mymodel.addCourse(textField_numsemester2.text,textField_namecourse2.text);
+                item_addcourse.visible=false;
+               }
+        }
+
+        Button {
+            id: button2_close
+            x: 341
+            y: 8
+            width: 28
+            height: 27
+            onClicked: item_addcourse.visible=false
+        }
+
+        TextField {
+            x: 64
+            y: 31
+            width: 250
+            height: 33
+            id: textField_numsemester2
+            placeholderText: qsTr("Введите номер семестра")
+        }
+        TextField {
+            x: 64
+            y: 81
+            width: 250
+            height: 33
+            id: textField_namecourse2
+            placeholderText: qsTr("Введите название курса")
+        }
+
+    }
+
+    Rectangle {
+        id: item_addimage
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: 402
+        height: 264
+        border.width: 1
+        visible: false
+        color: "#55aaff"
+
+        TextField {
+            id: textField_path
+            x: 76
+            y: 122
+            width: 250
+            height: 33
+            placeholderText: qsTr("Путь к изображению")
+
+            MouseArea {
+                anchors.fill: parent
+                id: mouseArea_path
+
+                onDoubleClicked: {
+                    fileDialog.visible = true;
+                }
+            }
+        }
+
+        Button {
+            id: button3_ok
+            x: 161
+            y: 229
+            text: qsTr("ОК")
+//            onClicked: {
+//            //mymodel.cutPath(textField_numsemester3.text,textField_namecourse3.text,);
+//            //item_addimage.visible=false;
+//           }
+        }
+
+        TextField {
+            id: textField_numsemester3
+            x: 76
+            y: 18
+            width: 250
+            height: 33
+            placeholderText: qsTr("Введите номер семестра")
+        }
+        Button {
+            id: button3_close
+            x: 367
+            y: 8
+            width: 27
+            height: 27
+            iconSource: "images/close.png"
+            onClicked: item_addimage.visible=false
+        }
+
+        TextField {
+            id: textField_namecourse3
+            x: 76
+            y: 70
+            width: 250
+            height: 33
+            placeholderText: qsTr("Введите название курса")
+        }
+
+        FileDialog {
+                            id: fileDialog
+                            title: "Выбор изображения"
+                            folder: shortcuts.home
+                            visible: false
+                            nameFilters: [ "Изображения (*.jpg *.png *.bmp *gif)", "Все файлы (*)" ]
+                            selectedNameFilter: "Изображения (*.jpg *.png *.bmp *gif)"
+                            onAccepted: {
+                                textField_path.text = mymodel.cutPath(fileDialog.fileUrl.toString());
+                            }
+        }
+
+        TextField {
+               id: textField_image_comment
+               x: 76
+               y: 174
+               width: 250
+               height: 33
+               placeholderText: qsTr("Введите комментарий")
+        }
+    }
+
+
+    Rectangle {
+        id: item_delsemester
+        x: 132
+        y: 160
+        width: 377
+        height: 132
+        visible: false
+        color: "#7bb8d1"
+        border.width: 1
+
+        Button {
+            id: button11_ok
+            x: 151
+            y: 82
+            text: qsTr("ОК")
+            onClicked: {
+                mymodel.deleteSemester(textField_numsemester11.text);
+                item_delsemester.visible=false;
+               }
+        }
+
+        Button {
+            id: button11_close
+            x: 348
+            y: 1
+            width: 28
+            height: 27
+            iconSource: "images/close.png"
+            //iconSource: "close.png"
+            onClicked: item_delsemester.visible=false
+        }
+
+        TextField {
             x: 66
             y: 31
             width: 250
             height: 33
-            id: textField_subject
-            placeholderText: qsTr("Введите название предмета")
-
+            id: textField_numsemester11
+            placeholderText: qsTr("Введите номер семестра")
         }
+    }
+    Rectangle {
+        id: item_delcourse
+        x: 132
+        y: 160
+        width: 377
+        height: 184
+        visible: false
+        color: "#7bb8d1"
+        border.width: 1
 
         Button {
-            id: button_ok1
-            x: 172
-            y: 192
+            id: button22_ok
+            x: 149
+            y: 130
             text: qsTr("ОК")
-            //onClicked: label1.text=textField_subject.text //Берет текст и выводит на label
-//            onClicked: {
-//                mymodel.addSemester(textField_term.text);
-//                item_term.visible=false;
-//               }
+            onClicked: {
+                mymodel.deleteCourse(textField_numsemester22.text,textField_namecourse22.text);
+                item_delcourse.visible=false;
+               }
         }
 
         Button {
-            id: button_close1
-            x: 398
-            y: 3
+            id: button22_close
+            x: 341
+            y: 8
             width: 28
             height: 27
-            iconSource: "close.png"
-            onClicked: item_subject.visible=false
+            onClicked: item_delcourse.visible=false
         }
 
-        Label {
-            id: label1
-            x: 29
-            y: 182
-            width: 79
-            height: 32
-
+        TextField {
+            x: 64
+            y: 31
+            width: 250
+            height: 33
+            id: textField_numsemester22
+            placeholderText: qsTr("Введите номер семестра")
         }
-    }*/
+        TextField {
+            x: 64
+            y: 81
+            width: 250
+            height: 33
+            id: textField_namecourse22
+            placeholderText: qsTr("Введите название курса")
+        }
 
+    }
 
 
 }
+
 
