@@ -380,7 +380,6 @@ void ImageProvider::addCourse(qint64 semesterNumber, QString courseName) {
 
     DataWrapper* semesterPtr = this->findFromNumber(root.children, semesterNumber);
     QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
-    this->fetchMoreWithoutShowing(semesterIndex);
     if (containsCourseAlready(semesterPtr->children, courseName)) {
         qDebug() << "contains course already";
         return;
@@ -444,7 +443,6 @@ void ImageProvider::addTheme(qint64 semesterNumber, QString courseName, QString 
 
     DataWrapper* semesterPtr = this->findFromNumber(root.children, semesterNumber);
     QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
-    this->fetchMoreWithoutShowing(semesterIndex);
     if (!containsCourseAlready(semesterPtr->children, courseName)) {
         qDebug() << "not contains course";
         this->addCourse(semesterNumber, courseName);
@@ -452,7 +450,6 @@ void ImageProvider::addTheme(qint64 semesterNumber, QString courseName, QString 
 
     DataWrapper* coursePtr = this->findFromName(semesterPtr->children, courseName);
     QModelIndex courseIndex = index(coursePtr->row, 0, semesterIndex);
-    this->fetchMoreWithoutShowing(courseIndex);
     if (containsCourseAlready(coursePtr->children, themeName)) {
         qDebug() << "contains theme already";
         return;
@@ -516,7 +513,6 @@ void ImageProvider::addImage(qint64 semesterNumber, QString courseName, QString 
 
     DataWrapper* semesterPtr = this->findFromNumber(root.children, semesterNumber);
     QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
-    this->fetchMoreWithoutShowing(semesterIndex);
     if (!containsCourseAlready(semesterPtr->children, courseName)) {
         qDebug() << "not contains course";
         addCourse(semesterNumber, courseName);
@@ -524,7 +520,6 @@ void ImageProvider::addImage(qint64 semesterNumber, QString courseName, QString 
 
     DataWrapper* coursePtr = this->findFromName(semesterPtr->children, courseName);
     QModelIndex courseIndex = index(coursePtr->row, 0, semesterIndex);
-    this->fetchMoreWithoutShowing(courseIndex);
     if (!containsCourseAlready(coursePtr->children, themeName)) {
         qDebug() << "not contains theme";
         addTheme(semesterNumber, courseName, themeName);
@@ -534,7 +529,6 @@ void ImageProvider::addImage(qint64 semesterNumber, QString courseName, QString 
     courseIndex = index(coursePtr->row, 0, semesterIndex);
     DataWrapper* themePtr = this->findFromName(coursePtr->children, themeName);
     QModelIndex themeIndex = index(themePtr->row, 0, courseIndex);
-    this->fetchMoreWithoutShowing(themeIndex);
     if (containsPathAlready(themePtr->children, path)) {
         qDebug() << "contains image already";
         return;
@@ -591,7 +585,7 @@ void ImageProvider::deleteImage(qint64 semesterNumber, QString courseName, QStri
     }
 //    QModelIndex rootIndex = createIndex(0, 0, &root);
     QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
-    this->fetchMoreWithoutShowing(semesterIndex);
+//    this->fetchMoreWithoutShowing(semesterIndex);
 
     DataWrapper* coursePtr = findFromName(semesterPtr->children, courseName);
     if (coursePtr == nullptr) {
@@ -599,7 +593,7 @@ void ImageProvider::deleteImage(qint64 semesterNumber, QString courseName, QStri
         return;
     }
     QModelIndex courseIndex = index(coursePtr->row, 0, semesterIndex);
-    this->fetchMoreWithoutShowing(courseIndex);
+//    this->fetchMoreWithoutShowing(courseIndex);
 
     DataWrapper* themePtr = findFromName(coursePtr->children, themeName);
     if (themePtr == nullptr) {
@@ -607,7 +601,7 @@ void ImageProvider::deleteImage(qint64 semesterNumber, QString courseName, QStri
         return;
     }
     QModelIndex themeIndex = index(themePtr->row, 0, courseIndex);
-    this->fetchMoreWithoutShowing(themeIndex);
+//    this->fetchMoreWithoutShowing(themeIndex);
 
     DataWrapper* imagePtr = findFromPath(themePtr->children, path);
     if (imagePtr == nullptr) {
@@ -630,7 +624,7 @@ void ImageProvider::deleteTheme(qint64 semesterNumber, QString courseName, QStri
     }
 //    QModelIndex rootIndex = createIndex(0, 0, &root);
     QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
-    this->fetchMoreWithoutShowing(semesterIndex);
+//    this->fetchMoreWithoutShowing(semesterIndex);
 
     DataWrapper* coursePtr = findFromName(semesterPtr->children, courseName);
     if (coursePtr == nullptr) {
@@ -638,7 +632,7 @@ void ImageProvider::deleteTheme(qint64 semesterNumber, QString courseName, QStri
         return;
     }
     QModelIndex courseIndex = index(coursePtr->row, 0, semesterIndex);
-    this->fetchMoreWithoutShowing(courseIndex);
+//    this->fetchMoreWithoutShowing(courseIndex);
 
     DataWrapper* themePtr = findFromName(coursePtr->children, themeName);
     if (themePtr == nullptr) {
@@ -659,8 +653,8 @@ void ImageProvider::deleteCourse(qint64 semesterNumber, QString courseName) {
         qDebug() << "No such semester";
         return;
     }
-    //QModelIndex rootIndex = createIndex(0, 0, &root);
     QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
+//    this->fetchMoreWithoutShowing(semesterIndex);
 
     DataWrapper* coursePtr = findFromName(semesterPtr->children, courseName);
     if (coursePtr == nullptr) {
@@ -725,7 +719,6 @@ void ImageProvider::addTags(qint64 semesterNumber, QString courseName, QString t
         return;
     }
     QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
-    this->fetchMoreWithoutShowing(semesterIndex);
 
     DataWrapper* coursePtr = findFromName(semesterPtr->children, courseName);
     if (coursePtr == nullptr) {
@@ -733,7 +726,6 @@ void ImageProvider::addTags(qint64 semesterNumber, QString courseName, QString t
         return;
     }
     QModelIndex courseIndex = index(coursePtr->row, 0, semesterIndex);
-    this->fetchMoreWithoutShowing(courseIndex);
 
     DataWrapper* themePtr = findFromName(coursePtr->children, themeName);
     if (themePtr == nullptr) {
@@ -741,7 +733,6 @@ void ImageProvider::addTags(qint64 semesterNumber, QString courseName, QString t
         return;
     }
     QModelIndex themeIndex = index(themePtr->row, 0, courseIndex);
-    this->fetchMoreWithoutShowing(themeIndex);
 
     DataWrapper* imagePtr = findFromPath(themePtr->children, path);
 
@@ -755,7 +746,6 @@ void ImageProvider::setComment(qint64 semesterNumber, QString courseName, QStrin
         return;
     }
     QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
-    this->fetchMoreWithoutShowing(semesterIndex);
 
     DataWrapper* coursePtr = findFromName(semesterPtr->children, courseName);
     if (coursePtr == nullptr) {
@@ -763,7 +753,6 @@ void ImageProvider::setComment(qint64 semesterNumber, QString courseName, QStrin
         return;
     }
     QModelIndex courseIndex = index(coursePtr->row, 0, semesterIndex);
-    this->fetchMoreWithoutShowing(courseIndex);
 
     DataWrapper* themePtr = findFromName(coursePtr->children, themeName);
     if (themePtr == nullptr) {
@@ -771,7 +760,6 @@ void ImageProvider::setComment(qint64 semesterNumber, QString courseName, QStrin
         return;
     }
     QModelIndex themeIndex = index(themePtr->row, 0, courseIndex);
-    this->fetchMoreWithoutShowing(themeIndex);
 
     DataWrapper* imagePtr = findFromPath(themePtr->children, path);
 
@@ -847,6 +835,14 @@ DataWrapper* ImageProvider::findFromPath (QList<DataWrapper*> children, QString 
     return nullptr;
 }
 
+//void ImageProvider::recountRowNumbers(QList<DataWrapper *> children) {
+//    qDebug() << "recountRowNumbers";
+
+//    for (qint64 i = 0; i < children.size(); ++i) {
+//            children[i]->row = i;
+//        }
+//}
+
 void ImageProvider::recountRowNumbers(QList<DataWrapper *> children) {
     qDebug() << "recountRowNumbers";
 
@@ -861,45 +857,45 @@ bool ImageProvider::hasChildren(const QModelIndex &parent) const
     return ptr->childrenCount!=0;
 }
 
-void ImageProvider::fetchMoreWithoutShowing(const QModelIndex &parent) {
-    DataWrapper* parentDataWrapper = dataForIndex(parent);
-    parentDataWrapper->children.clear();
+//void ImageProvider::fetchMoreWithoutShowing(const QModelIndex &parent) {
+//    DataWrapper* parentDataWrapper = dataForIndex(parent);
+//    parentDataWrapper->children.clear();
 
-    QSqlQuery query;
-    query.prepare("SELECT * FROM IMAGES WHERE PID=:id ORDER BY number");
-    query.bindValue(":id", parentDataWrapper->id);
-    query.exec();
-    qint64 count = 0;
-    while(query.next()) {
-      DataWrapper* childWrapper = new DataWrapper;
-      dbData* childData = new dbData;
+//    QSqlQuery query;
+//    query.prepare("SELECT * FROM IMAGES WHERE PID=:id ORDER BY number");
+//    query.bindValue(":id", parentDataWrapper->id);
+//    query.exec();
+//    qint64 count = 0;
+//    while(query.next()) {
+//      DataWrapper* childWrapper = new DataWrapper;
+//      dbData* childData = new dbData;
 
-      childData->comments = query.value("comment").toString();
-      childData->pid = query.value("pid").toInt();
-      childData->tags = query.value("tags").toStringList();
-      childData->path = query.value("path").toString();
+//      childData->comments = query.value("comment").toString();
+//      childData->pid = query.value("pid").toInt();
+//      childData->tags = query.value("tags").toStringList();
+//      childData->path = query.value("path").toString();
 
-      childWrapper->row = count++;
-      childWrapper->number = query.value("number").toInt();
-      childWrapper->data = childData;
-      childWrapper->children = {};
-      childWrapper->id = query.value("id").toInt();
-      childWrapper->parent_pointer = parentDataWrapper;
+//      childWrapper->row = count++;
+//      childWrapper->number = query.value("number").toInt();
+//      childWrapper->data = childData;
+//      childWrapper->children = {};
+//      childWrapper->id = query.value("id").toInt();
+//      childWrapper->parent_pointer = parentDataWrapper;
 
-      childWrapper->childrenCount = getChildrenCount(childWrapper->id);
+//      childWrapper->childrenCount = getChildrenCount(childWrapper->id);
 
-      QString type = query.value("type").toString();
-      if (type == "semester")
-        childWrapper->type = SEMESTER;
-      else if (type  == "course")
-        childWrapper->type = COURSE;
-      else if (type  == "theme")
-        childWrapper->type = THEME;
-      else if (type == "image")
-        childWrapper->type = IMAGE;
+//      QString type = query.value("type").toString();
+//      if (type == "semester")
+//        childWrapper->type = SEMESTER;
+//      else if (type  == "course")
+//        childWrapper->type = COURSE;
+//      else if (type  == "theme")
+//        childWrapper->type = THEME;
+//      else if (type == "image")
+//        childWrapper->type = IMAGE;
 
-      parentDataWrapper->children.append(childWrapper);
-    }
-}
+//      parentDataWrapper->children.append(childWrapper);
+//    }
+//}
 
 

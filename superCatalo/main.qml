@@ -540,7 +540,7 @@ ApplicationWindow {
             y: 169
             text: qsTr("ОК")
             onClicked: {
-                mymodel.deleteTheme(textField_numsemester3.text,textField_namecourse3.text,textField_nametheme3.text);
+                mymodel.deleteTheme(textField_numsemester33.text,textField_namecourse33.text,textField_nametheme33.text);
                 item_deltheme.visible=false;
                }
         }
