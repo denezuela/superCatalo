@@ -10,16 +10,13 @@
 #include <QModelIndex>
 
 
-enum dataType {ROOT, SEMESTER, COURSE, IMAGE};
+enum dataType {ROOT, SEMESTER, COURSE, THEME, IMAGE};
 
 struct dbData{
-//    qint64 id;
     qint64 pid;
-//    qint64 number;
     QString path;
     QString comments;
     QStringList tags;
-//    QString type;
 };
 Q_DECLARE_METATYPE(dbData)
 
@@ -69,21 +66,19 @@ class ImageProvider : public QAbstractItemModel
         virtual bool removeRows(int row, int count, const QModelIndex &parent);
         void setDataSemester(qint64 semesterNumber);
         void setDataCourse(const QModelIndex &parent, QString courseName);
+        void setDataTheme(const QModelIndex &parent, QString themeName);
         void setDataImage(const QModelIndex &parent, QString path, QString comments, QStringList tags={});
         void removeDataFromDb(qint64 id);
 
-Q_INVOKABLE  void addImage(qint64 semesterNumber, QString courseName, QString path, QString comments, QStringList tags = {});
+Q_INVOKABLE  void addImage(qint64 semesterNumber, QString courseName, QString themeName, QString path, QString comments = "", QStringList tags = {});
 Q_INVOKABLE  void addSemester(qint64 semesterNumber);
 Q_INVOKABLE  void addCourse(qint64 semesterNumber, QString courseName);
+Q_INVOKABLE  void addTheme(qint64 semesterNumber, QString courseName, QString themeName);
 
-Q_INVOKABLE  void deleteImage(qint64 semesterNumber, QString courseName, QString path);
+Q_INVOKABLE  void deleteImage(qint64 semesterNumber, QString courseName, QString themeName, QString path);
 Q_INVOKABLE  void deleteCourse(qint64 semesterNumber, QString courseName);
 Q_INVOKABLE  void deleteSemester(qint64 semesterNumber);
-
-
-
-
-
+//Q_INVOKABLE  void deleteTheme(qint64 semesterNumber, QString courseName, QString themeName);
 
         bool hasChildren(const QModelIndex &parent) const;
 
