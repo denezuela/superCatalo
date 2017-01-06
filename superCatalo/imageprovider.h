@@ -70,6 +70,7 @@ class ImageProvider : public QAbstractItemModel
         void setDataTheme(const QModelIndex &parent, QString themeName);
         void setDataImage(const QModelIndex &parent, QString path, QString comments, QStringList tags={});
         void removeDataFromDb(qint64 id);
+        bool hasChildren(const QModelIndex &parent) const;
 
 Q_INVOKABLE  void addImage(qint64 semesterNumber, QString courseName, QString themeName, QString path, QString comments = "", QStringList tags = {});
 Q_INVOKABLE  void addSemester(qint64 semesterNumber);
@@ -81,7 +82,7 @@ Q_INVOKABLE  void deleteCourse(qint64 semesterNumber, QString courseName);
 Q_INVOKABLE  void deleteSemester(qint64 semesterNumber);
 Q_INVOKABLE  void deleteTheme(qint64 semesterNumber, QString courseName, QString themeName);
 
-        bool hasChildren(const QModelIndex &parent) const;
+Q_INVOKABLE  void addTags(qint64 semesterNumber, QString courseName, QString themeName, QString path, QStringList tags);
 
     signals:
 

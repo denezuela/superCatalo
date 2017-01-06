@@ -718,6 +718,36 @@ void ImageProvider::removeDataFromDb(qint64 id) {
     queryForDelete.next();
 }
 
+void ImageProvider::addTags(qint64 semesterNumber, QString courseName, QString themeName, QString path, QStringList tags) {
+    DataWrapper* semesterPtr = findFromNumber(root.children, semesterNumber);
+    if (semesterPtr == nullptr) {
+        qDebug() << "No such semester";
+        return;
+    }
+    QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
+    this->fetchMoreWithoutShowing(semesterIndex);
+
+    DataWrapper* coursePtr = findFromName(semesterPtr->children, courseName);
+    if (coursePtr == nullptr) {
+        qDebug() << "No such course";
+        return;
+    }
+    QModelIndex courseIndex = index(coursePtr->row, 0, semesterIndex);
+    this->fetchMoreWithoutShowing(courseIndex);
+
+    DataWrapper* themePtr = findFromName(coursePtr->children, themeName);
+    if (themePtr == nullptr) {
+        qDebug() << "No such theme";
+        return;
+    }
+    QModelIndex themeIndex = index(themePtr->row, 0, courseIndex);
+    this->fetchMoreWithoutShowing(themeIndex);
+
+    DataWrapper* imagePtr = findFromPath(themePtr->children, path);
+
+    imagePtr->data->tags.append(tags);
+}
+
 //private functions
 
 bool ImageProvider::containsSemesterAlready (QList<DataWrapper*> children, qint64 number) {
