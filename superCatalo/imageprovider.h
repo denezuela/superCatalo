@@ -8,6 +8,9 @@
 #include <QList>
 #include <QStringList>
 #include <QModelIndex>
+#include <QUrl>
+
+#include <QVariant>
 
 
 enum dataType {ROOT, SEMESTER, COURSE, THEME, IMAGE};
@@ -84,7 +87,11 @@ Q_INVOKABLE  void deleteTheme(qint64 semesterNumber, QString courseName, QString
 
 Q_INVOKABLE  void addTags(qint64 semesterNumber, QString courseName, QString themeName, QString path, QStringList tags);
 Q_INVOKABLE  void setComment(qint64 semesterNumber, QString courseName, QString themeName, QString path, QString comment);
-    signals:
+
+
+
+
+   signals:
 
     public slots:
 };

@@ -4,5 +4,6 @@
         <file>StartForm.qml</file>
         <file>images/delete.svg</file>
         <file>images/close.png</file>
+        <file>WindowButton.qml</file>
     </qresource>
 </RCC>

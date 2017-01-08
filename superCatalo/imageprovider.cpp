@@ -898,4 +898,3 @@ bool ImageProvider::hasChildren(const QModelIndex &parent) const
 //    }
 //}
 
-
