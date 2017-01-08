@@ -3,13 +3,16 @@ import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
 import QtQml.Models 2.2
 import QtQuick.Controls.Styles 1.4
+import QtQuick.Layouts 1.3
+import QtQuick.Window 2.0
+import QtGraphicalEffects 1.0
+
 
 ApplicationWindow {
-    id:window1
+    id:window
     visible: true
-    width: 640
-    height: 480
-    color: "#7bb8d1"
+    width: 700
+    height: 550
     title: qsTr("Super Catalo")
 
     StartForm {
@@ -29,6 +32,15 @@ ApplicationWindow {
     }
 
     menuBar: MenuBar {
+        style: MenuBarStyle
+        {
+            background:
+                Rectangle {
+                  color: "#ffffff";
+                  border.color: "#ffffff" // "#2bb2eb"
+                  border.width: 0.5
+              }
+        }
         Menu {
             id: menu_a
             title: qsTr("Добавить")
@@ -96,21 +108,32 @@ ApplicationWindow {
             }
 
         }
+        Menu {
+            title: "Выход"
+            //onTriggered: Qt.quit();
+
+        }
     }
 
-    TreeView {
-            id: treeView
-            x: 9
-            y: 42
-            width: 186
-            height: 407
-            model: mymodel
-            backgroundVisible: true
-            frameVisible: true
-            style: TreeViewStyle {
-              alternateBackgroundColor: "#398eb1" //цвет полосок
-              backgroundColor: "#398eb1" //цвет фона
-            }
+
+TreeView {
+        id: treeView
+        x: 3
+        y: 2
+        width: parent.width/3.8 //ширина
+        height: parent.height/1.05+7 // высота
+        model: mymodel
+        backgroundVisible: true
+        frameVisible: true
+        style: TreeViewStyle {
+          alternateBackgroundColor: "#398eb1" //цвет полосок
+          backgroundColor: "#398eb1" //цвет фона
+        }
+        TableViewColumn{
+                    title:"Структура"
+                    role: "display"
+                    width:300 //появляется прокрутка
+        }
             TableViewColumn{
                         title:"Структура"
                         role: "display"
@@ -118,7 +141,8 @@ ApplicationWindow {
             }
             MouseArea {
                 id: mouseArea_tree
-                anchors.bottomMargin: 21
+                anchors.topMargin: 0
+                anchors.bottomMargin: 0
                 anchors.fill: parent
                 acceptedButtons: Qt.RightButton | Qt.LeftButton
                 onClicked:
@@ -150,32 +174,30 @@ ApplicationWindow {
 
     Image {
         id: image
-        x: 211
-        y: 42
-        width: 394
-        height: 392
+        anchors.left: treeView.right
+        anchors.leftMargin: 8
+        anchors.top: slider_rotation.bottom
+        anchors.right:parent.right
+        anchors.rightMargin: 8
+        anchors.bottom: treeView.bottom
+        scale: slider_image.value
         rotation: slider_rotation.value*360
-        //scale: slider_image.value
 
         MouseArea {
             // действуем в пределах всего элемента Image
             anchors.fill: parent
-            id: mouseArea_2
-            anchors.rightMargin: 0
-            anchors.bottomMargin: 0
-            anchors.leftMargin: 0
-            anchors.topMargin: 0
+            id: mouseArea_image
         }
     }
 
     Slider {
         id: slider_rotation
-        x: 419
-        y: 17
-        //anchors.left: button_turn.right
-        anchors.leftMargin: 5
-        width: 107
-        height: 27
+        x: 553
+        y: 11
+        anchors.left:treeView.right
+        anchors.leftMargin: 8
+        width: 100
+        height: 20
         stepSize: 0.001
         visible: false
         onEnabledChanged: {
@@ -185,12 +207,12 @@ ApplicationWindow {
 
     Slider {
         id: slider_image
-        x: 301
-        y: 17
-        //anchors.left: slider_rotation.right
+        x: 447
+        y: 11
+        anchors.left: slider_rotation.right
         anchors.leftMargin: 5
-        width: 107
-        height: 27
+        width: 100
+        height: 20
         value: 0.5
         maximumValue: 1
         visible: false
@@ -198,13 +220,21 @@ ApplicationWindow {
 
     Rectangle {
         id: item_addsemester
-        x: 132
-        y: 160
+        anchors.centerIn: parent
         width: 377
         height: 132
         visible: false
-        color: "#7bb8d1"
+        color: "#398eb1"
         border.width: 1
+
+        TextField {
+            x: 66
+            y: 31
+            width: 250
+            height: 33
+            id: textField_numsemester1
+            placeholderText: qsTr("Введите номер семестра")
+        }
 
         Button {
             id: button1_ok
@@ -214,6 +244,7 @@ ApplicationWindow {
             onClicked: {
                 mymodel.addSemester(textField_numsemester1.text);
                 item_addsemester.visible=false;
+                textField_numsemester1.text="";
                }
         }
 
@@ -224,49 +255,18 @@ ApplicationWindow {
             width: 28
             height: 27
             iconSource: "images/close.png"
-            //iconSource: "close.png"
-            onClicked: item_semester.visible=false
-        }
-
-        TextField {
-            x: 66
-            y: 31
-            width: 250
-            height: 33
-            id: textField_numsemester1
-            placeholderText: qsTr("Введите номер семестра")
+            onClicked: item_addsemester.visible=false
         }
     }
 
     Rectangle {
         id: item_addcourse
-        x: 132
-        y: 160
+        anchors.centerIn: parent
         width: 377
         height: 184
         visible: false
-        color: "#7bb8d1"
+        color: "#398eb1"
         border.width: 1
-
-        Button {
-            id: button2_ok
-            x: 149
-            y: 130
-            text: qsTr("ОК")
-            onClicked: {
-                mymodel.addCourse(textField_numsemester2.text,textField_namecourse2.text);
-                item_addcourse.visible=false;
-               }
-        }
-
-        Button {
-            id: button2_close
-            x: 341
-            y: 8
-            width: 28
-            height: 27
-            onClicked: item_addcourse.visible=false
-        }
 
         TextField {
             x: 64
@@ -282,40 +282,39 @@ ApplicationWindow {
             width: 250
             height: 33
             id: textField_namecourse2
-            placeholderText: qsTr("Введите название курса")
+            placeholderText: qsTr("Введите название предмета")
         }
-
-    }
-
-    Rectangle {
-        id: item_addtheme
-        x: 132
-        y: 136
-        width: 377
-        height: 208
-        visible: false
-        color: "#7bb8d1"
-        border.width: 1
-
         Button {
-            id: button3_ok
+            id: button2_ok
             x: 149
-            y: 169
+            y: 130
             text: qsTr("ОК")
             onClicked: {
-                mymodel.addTheme(textField_numsemester3.text,textField_namecourse3.text,textField_nametheme3.text);
-                item_addtheme.visible=false;
+                mymodel.addCourse(textField_numsemester2.text,textField_namecourse2.text);
+                item_addcourse.visible=false;
+                textField_numsemester2.text=""; textField_namecourse2.text="";
                }
         }
 
         Button {
-            id: button3_close
-            x: 336
+            id: button2_close
+            x: 341
             y: 8
             width: 28
             height: 27
-            onClicked: item_addtheme.visible=false
+            iconSource: "images/close.png"
+            onClicked: item_addcourse.visible=false
         }
+    }
+
+    Rectangle {
+        id: item_addtheme
+        anchors.centerIn: parent
+        width: 377
+        height: 208
+        visible: false
+        color: "#398eb1"
+        border.width: 1
 
         TextField {
             x: 64
@@ -342,23 +341,70 @@ ApplicationWindow {
             id: textField_nametheme3
             placeholderText: qsTr("Введите название темы")
         }
+        Button {
+            id: button3_ok
+            x: 149
+            y: 169
+            text: qsTr("ОК")
+            onClicked: {
+                mymodel.addTheme(textField_numsemester3.text,textField_namecourse3.text,textField_nametheme3.text);
+                item_addtheme.visible=false;
+                textField_numsemester3.text="";textField_namecourse3.text="";textField_nametheme3.text="";
+               }
+        }
+
+        Button {
+            id: button3_close
+            x: 336
+            y: 8
+            width: 28
+            height: 27
+            iconSource: "images/close.png"
+            onClicked: item_addtheme.visible=false
+        }
 
     }
 
     Rectangle {
         id: item_addimage
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.centerIn: parent
         width: 402
-        height: 264
+        height: 270
+        color: "#398eb1"
         border.width: 1
         visible: false
-        color: "#55aaff"
+
+        TextField {
+            id: textField_numsemester4
+            x: 76
+            y: 10
+            width: 250
+            height: 33
+            placeholderText: qsTr("Введите номер семестра")
+        }
+
+        TextField {
+            id: textField_namecourse4
+            x: 76
+            y: 55
+            width: 250
+            height: 33
+            placeholderText: qsTr("Введите название предмета")
+        }
+
+        TextField {
+            id: textField_nametheme4
+            x: 76
+            y: 100
+            width: 250
+            height: 33
+            placeholderText: qsTr("Введите название темы")
+        }
 
         TextField {
             id: textField_path
             x: 76
-            y: 122
+            y: 145
             width: 250
             height: 33
             placeholderText: qsTr("Путь к изображению")
@@ -373,44 +419,6 @@ ApplicationWindow {
             }
         }
 
-        Button {
-            id: button4_ok
-            x: 161
-            y: 229
-            text: qsTr("ОК")
-//            onClicked: {
-//            //mymodel.cutPath(textField_numsemester3.text,textField_namecourse3.text,);
-//            //item_addimage.visible=false;
-//           }
-        }
-
-        TextField {
-            id: textField_numsemester4
-            x: 76
-            y: 18
-            width: 250
-            height: 33
-            placeholderText: qsTr("Введите номер семестра")
-        }
-        Button {
-            id: button4_close
-            x: 367
-            y: 8
-            width: 27
-            height: 27
-            iconSource: "images/close.png"
-            onClicked: item_addimage.visible=false
-        }
-
-        TextField {
-            id: textField_namecourse4
-            x: 76
-            y: 70
-            width: 250
-            height: 33
-            placeholderText: qsTr("Введите название курса")
-        }
-
         FileDialog {
                             id: fileDialog
                             title: "Выбор изображения"
@@ -419,17 +427,60 @@ ApplicationWindow {
                             nameFilters: [ "Изображения (*.jpg *.png *.bmp *gif)", "Все файлы (*)" ]
                             selectedNameFilter: "Изображения (*.jpg *.png *.bmp *gif)"
                             onAccepted: {
-                                textField_path.text = mymodel.cutPath(fileDialog.fileUrl.toString());
+                                textField_path.text=fileDialog.fileUrl;
+                                //textField_path.text = "";
+
                             }
+                            onRejected: { console.log("Rejected") }
         }
 
+
         TextField {
-               id: textField_image_comment
+               id: textField_imagecomment
                x: 76
-               y: 174
+               y: 190
                width: 250
                height: 33
                placeholderText: qsTr("Введите комментарий")
+        }
+
+        Button {
+            id:buttonbrowse
+            width: 70
+            height: 33
+            anchors.left: textField_path.right
+            anchors.bottom: textField_path.bottom
+            anchors.leftMargin: 2
+            text:"Browse"
+            visible: true
+            style:  ButtonStyle {
+                background: Rectangle{
+                    color: control.pressed ? "#2bb2eb"  : "#398eb1"
+                    border.color: "#ffffff"
+                    radius: 5
+                }
+        }
+         onClicked: fileDialog.open()
+        }
+
+        Button {
+            id: button4_ok
+            x: 161
+            y: 230
+            text: qsTr("ОК")
+            onClicked: {
+            mymodel.addImage(textField_numsemester4.text,textField_namecourse4.text,textField_nametheme4.text,textField_path.text,textField_imagecomment.text);
+            item_addimage.visible=false;
+           }
+        }
+
+        Button {
+            id: button4_close
+            anchors.right: parent.right
+            width: 27
+            height: 27
+            iconSource: "images/close.png"
+            onClicked: item_addimage.visible=false
         }
     }
 
@@ -552,6 +603,8 @@ ApplicationWindow {
             width: 28
             height: 27
             onClicked: item_deltheme.visible=false
+            iconSource: "/images/close.png"
+            //iconSource: "/images/delete.svg"
         }
 
 

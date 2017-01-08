@@ -12,14 +12,21 @@ Item {
     Rectangle {
         gradient: Gradient {
             GradientStop {
-                position: 0.52
-                color: "#7bb8d1"
+                position: 0.02
+                color: "#ffffff"
             }
 
             GradientStop {
-                position: 1
-                color: "#0e5776"
+                position: 0.5
+                color: "#2bb2eb"
             }
+
+            GradientStop {
+                position: 0.949
+                color: "#1b4251"
+            }
+
+
         }
         anchors.leftMargin: 0
         anchors.topMargin: 0
@@ -28,28 +35,27 @@ Item {
         anchors.fill: parent
 }
 
-    Component {
-        id: buttonStyle
-        ButtonStyle {
-            background: Rectangle{
-                color: "#398eb1"
-                border.color: "#135083"
-                radius: 4
-            }
-            label: Text {
-                renderType: Text.NativeRendering
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
-                font.family: "Helvetica"
-                font.pointSize: 12
-                font.bold: true
-                font.italic: true
-                color: "black"
-                text: control.text
-            }
-        }  
-      }
-
+//    Component {
+//                id: buttonStyle
+//                ButtonStyle {
+//                    background: Rectangle{
+//                        color: "#398eb1"
+//                        border.color: "#135083"
+//                        radius: 4
+//                    }
+//                    label: Text {
+//                        renderType: Text.NativeRendering
+//                        verticalAlignment: Text.AlignVCenter
+//                        horizontalAlignment: Text.AlignHCenter
+//                        font.family: "Helvetica"
+//                        font.pointSize: 12
+//                        font.bold: true
+//                        font.italic: true
+//                        color: "black"
+//                        text: control.text
+//                    }
+//                }
+//              }
 //    Button {
 //        id:button_rotation
 //        x: 19
@@ -91,15 +97,15 @@ Item {
 //        style: buttonStyle
 //    }
 
-    Button {
-        id: button_close
-        x:604
-        y:7
-        width: 28
-        height: 27
-        //iconSource: "close.png"
-        style: buttonStyle
-        //onTriggered: Qt.quit();
+    WindowButton
+    {
+      // Кнопка закрытия окна
+      id: button_close
+      x:604
+      y:2
+      anchors.right: parent.right
+      source: "/images/close.png";
+      function callback() {Qt.quit();}
     }
 
 }
