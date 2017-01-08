@@ -518,16 +518,14 @@ void ImageProvider::addImage(qint64 semesterNumber, QString courseName, QString 
         addCourse(semesterNumber, courseName);
     }
 
-    DataWrapper* coursePtr = this->findFromName(semesterPtr->children, courseName);
+    DataWrapper* coursePtr = this->findFromName(root.children[semesterPtr->row]->children, courseName);
     QModelIndex courseIndex = index(coursePtr->row, 0, semesterIndex);
     if (!containsCourseAlready(coursePtr->children, themeName)) {
         qDebug() << "not contains theme";
         addTheme(semesterNumber, courseName, themeName);
     }
 
-    coursePtr = this->findFromName(semesterPtr->children, courseName);
-    courseIndex = index(coursePtr->row, 0, semesterIndex);
-    DataWrapper* themePtr = this->findFromName(coursePtr->children, themeName);
+    DataWrapper* themePtr = this->findFromName(root.children[semesterPtr->row]->children[coursePtr->row]->children, themeName);
     QModelIndex themeIndex = index(themePtr->row, 0, courseIndex);
     if (containsPathAlready(themePtr->children, path)) {
         qDebug() << "contains image already";
@@ -857,44 +855,44 @@ bool ImageProvider::hasChildren(const QModelIndex &parent) const
     return ptr->childrenCount!=0;
 }
 
-//void ImageProvider::fetchMoreWithoutShowing(const QModelIndex &parent) {
-//    DataWrapper* parentDataWrapper = dataForIndex(parent);
-//    parentDataWrapper->children.clear();
+void ImageProvider::fetchMoreWithoutShowing(const QModelIndex &parent) {
+    DataWrapper* parentDataWrapper = dataForIndex(parent);
+    parentDataWrapper->children.clear();
 
-//    QSqlQuery query;
-//    query.prepare("SELECT * FROM IMAGES WHERE PID=:id ORDER BY number");
-//    query.bindValue(":id", parentDataWrapper->id);
-//    query.exec();
-//    qint64 count = 0;
-//    while(query.next()) {
-//      DataWrapper* childWrapper = new DataWrapper;
-//      dbData* childData = new dbData;
+    QSqlQuery query;
+    query.prepare("SELECT * FROM IMAGES WHERE PID=:id ORDER BY number");
+    query.bindValue(":id", parentDataWrapper->id);
+    query.exec();
+    qint64 count = 0;
+    while(query.next()) {
+      DataWrapper* childWrapper = new DataWrapper;
+      dbData* childData = new dbData;
 
-//      childData->comments = query.value("comment").toString();
-//      childData->pid = query.value("pid").toInt();
-//      childData->tags = query.value("tags").toStringList();
-//      childData->path = query.value("path").toString();
+      childData->comments = query.value("comment").toString();
+      childData->pid = query.value("pid").toInt();
+      childData->tags = query.value("tags").toStringList();
+      childData->path = query.value("path").toString();
 
-//      childWrapper->row = count++;
-//      childWrapper->number = query.value("number").toInt();
-//      childWrapper->data = childData;
-//      childWrapper->children = {};
-//      childWrapper->id = query.value("id").toInt();
-//      childWrapper->parent_pointer = parentDataWrapper;
+      childWrapper->row = count++;
+      childWrapper->number = query.value("number").toInt();
+      childWrapper->data = childData;
+      childWrapper->children = {};
+      childWrapper->id = query.value("id").toInt();
+      childWrapper->parent_pointer = parentDataWrapper;
 
-//      childWrapper->childrenCount = getChildrenCount(childWrapper->id);
+      childWrapper->childrenCount = getChildrenCount(childWrapper->id);
 
-//      QString type = query.value("type").toString();
-//      if (type == "semester")
-//        childWrapper->type = SEMESTER;
-//      else if (type  == "course")
-//        childWrapper->type = COURSE;
-//      else if (type  == "theme")
-//        childWrapper->type = THEME;
-//      else if (type == "image")
-//        childWrapper->type = IMAGE;
+      QString type = query.value("type").toString();
+      if (type == "semester")
+        childWrapper->type = SEMESTER;
+      else if (type  == "course")
+        childWrapper->type = COURSE;
+      else if (type  == "theme")
+        childWrapper->type = THEME;
+      else if (type == "image")
+        childWrapper->type = IMAGE;
 
-//      parentDataWrapper->children.append(childWrapper);
-//    }
-//}
+      parentDataWrapper->children.append(childWrapper);
+    }
+}
 

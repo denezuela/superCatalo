@@ -427,7 +427,7 @@ TreeView {
                             nameFilters: [ "Изображения (*.jpg *.png *.bmp *gif)", "Все файлы (*)" ]
                             selectedNameFilter: "Изображения (*.jpg *.png *.bmp *gif)"
                             onAccepted: {
-                                textField_path.text=fileDialog.fileUrl;
+                                textField_path.text=(fileDialog.fileUrl.toString()).slice(7);
                                 //textField_path.text = "";
 
                             }
