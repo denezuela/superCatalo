@@ -156,6 +156,7 @@ TreeView {
                     if (mouse.button === Qt.RightButton)
                     {
                         var index_2 = parent.indexAt(mouse.x, mouse.y);
+                        mymodel.setCurrentIndex(index_2);
                         if (index_2.valid) menu_a.popup();
                 }
                 }

@@ -41,6 +41,7 @@ class ImageProvider : public QAbstractItemModel
     private:
         QSqlDatabase db;
         DataWrapper root{0, ROOT, nullptr, 0, 0, nullptr, {}, 0};
+        QModelIndex currentIndex;
         bool containsSemesterAlready (QList<DataWrapper*> children, qint64 number);
         bool containsCourseAlready (QList<DataWrapper*> children, QString comments);
         bool containsPathAlready (QList<DataWrapper*> children, QString path);
@@ -75,15 +76,18 @@ class ImageProvider : public QAbstractItemModel
         void removeDataFromDb(qint64 id);
         bool hasChildren(const QModelIndex &parent) const;
 
-Q_INVOKABLE  void addImage(qint64 semesterNumber, QString courseName, QString themeName, QString path, QString comments = "", QStringList tags = {});
-Q_INVOKABLE  void addSemester(qint64 semesterNumber);
-Q_INVOKABLE  void addCourse(qint64 semesterNumber, QString courseName);
-Q_INVOKABLE  void addTheme(qint64 semesterNumber, QString courseName, QString themeName);
+Q_INVOKABLE  void setCurrentIndex (const QModelIndex &currentIndex);
+Q_INVOKABLE  void deleteItem();
 
-Q_INVOKABLE  void deleteImage(qint64 semesterNumber, QString courseName, QString themeName, QString path);
-Q_INVOKABLE  void deleteCourse(qint64 semesterNumber, QString courseName);
-Q_INVOKABLE  void deleteSemester(qint64 semesterNumber);
-Q_INVOKABLE  void deleteTheme(qint64 semesterNumber, QString courseName, QString themeName);
+Q_INVOKABLE  void addImage(QString path, QString comments = "", QStringList tags = {});
+Q_INVOKABLE  void addSemester(qint64 semesterNumber);
+Q_INVOKABLE  void addCourse(QString courseName);
+Q_INVOKABLE  void addTheme(QString themeName);
+
+//Q_INVOKABLE  void deleteImage(qint64 semesterNumber, QString courseName, QString themeName, QString path);
+//Q_INVOKABLE  void deleteCourse(qint64 semesterNumber, QString courseName);
+//Q_INVOKABLE  void deleteSemester(qint64 semesterNumber);
+//Q_INVOKABLE  void deleteTheme(qint64 semesterNumber, QString courseName, QString themeName);
 
 Q_INVOKABLE  void addTags(qint64 semesterNumber, QString courseName, QString themeName, QString path, QStringList tags);
 Q_INVOKABLE  void setComment(qint64 semesterNumber, QString courseName, QString themeName, QString path, QString comment);

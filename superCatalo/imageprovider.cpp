@@ -313,8 +313,9 @@ void ImageProvider::setDataSemester(qint64 semesterNumber) {
     childWrapper->data->tags.append("NO_TAGS");
 }
 
-
 void ImageProvider::addSemester(qint64 semesterNumber) {
+    if (!this->currentIndex.isValid()) return;
+
     qDebug() << "addSemester";
     if (containsSemesterAlready(root.children, semesterNumber)) {
         qDebug() << "contains semester already";
@@ -324,7 +325,6 @@ void ImageProvider::addSemester(qint64 semesterNumber) {
     QModelIndex rootIndex = createIndex(0, 0, &root);
 
     insertRows(this->rowCount(rootIndex), 1, QModelIndex());
-
     QModelIndex index = createIndex(this->rowCount(rootIndex), 0, root.children[this->rowCount(rootIndex)-1]);
     this->setData(index, semesterNumber, Qt::EditRole);
 }
@@ -370,27 +370,24 @@ void ImageProvider::setDataCourse(const QModelIndex &parent, QString courseName)
     childWrapper->data->tags.append(courseName);
 }
 
-void ImageProvider::addCourse(qint64 semesterNumber, QString courseName) {
-    qDebug() << "addCourse";
+void ImageProvider::addCourse(QString courseName) {
+    if (!this->currentIndex.isValid()) return;
 
-    if (!containsSemesterAlready(root.children, semesterNumber)) {
-        qDebug() << "not contains semester";
-        this->addSemester(semesterNumber);
-    }
+    qDebug() << "add course";
 
-    DataWrapper* semesterPtr = this->findFromNumber(root.children, semesterNumber);
-    QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
-    if (containsCourseAlready(semesterPtr->children, courseName)) {
-        qDebug() << "contains course already";
-        return;
-    }
+    DataWrapper* ptr = dataForIndex(this->currentIndex);
+    if (containsCourseAlready(ptr->children, courseName)) {
+            qDebug() << "contains course already";
+            return;
+        }
 
-    insertRows(this->rowCount(semesterIndex), 1, semesterIndex);
+    insertRows(this->rowCount(this->currentIndex), 1, this->currentIndex);
 
-    QModelIndex index = createIndex(this->rowCount(semesterIndex), 0,
-                                    dataForIndex(semesterIndex)->children[this->rowCount(semesterIndex)-1]);
+    QModelIndex index = createIndex(this->rowCount(this->currentIndex), 0,
+                                    ptr->children[this->rowCount(this->currentIndex)-1]);
     this->setData(index, courseName, Qt::EditRole);
 }
+
 
 void ImageProvider::setDataTheme(const QModelIndex &parent, QString themeName) {
 
@@ -433,34 +430,24 @@ void ImageProvider::setDataTheme(const QModelIndex &parent, QString themeName) {
     childWrapper->data->tags.append(themeName);
 }
 
-void ImageProvider::addTheme(qint64 semesterNumber, QString courseName, QString themeName) {
-    qDebug() << "addTheme";
+void ImageProvider::addTheme(QString themeName) {
+    if (!this->currentIndex.isValid()) return;
 
-    if (!containsSemesterAlready(root.children, semesterNumber)) {
-        qDebug() << "not contains semester";
-        this->addSemester(semesterNumber);
-    }
+    qDebug() << "add theme";
 
-    DataWrapper* semesterPtr = this->findFromNumber(root.children, semesterNumber);
-    QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
-    if (!containsCourseAlready(semesterPtr->children, courseName)) {
-        qDebug() << "not contains course";
-        this->addCourse(semesterNumber, courseName);
-    }
+    DataWrapper* ptr = dataForIndex(this->currentIndex);
+    if (containsCourseAlready(ptr->children, themeName)) {
+            qDebug() << "contains theme already";
+            return;
+        }
 
-    DataWrapper* coursePtr = this->findFromName(semesterPtr->children, courseName);
-    QModelIndex courseIndex = index(coursePtr->row, 0, semesterIndex);
-    if (containsCourseAlready(coursePtr->children, themeName)) {
-        qDebug() << "contains theme already";
-        return;
-    }
+    insertRows(this->rowCount(this->currentIndex), 1, this->currentIndex);
 
-    insertRows(this->rowCount(courseIndex), 1, courseIndex);
-
-    QModelIndex index = createIndex(this->rowCount(courseIndex), 0,
-                                    dataForIndex(courseIndex)->children[this->rowCount(courseIndex)-1]);
+    QModelIndex index = createIndex(this->rowCount(this->currentIndex), 0,
+                                    ptr->children[this->rowCount(this->currentIndex)-1]);
     this->setData(index, themeName, Qt::EditRole);
 }
+
 
 void ImageProvider::setDataImage(const QModelIndex &parent, QString path, QString comments, QStringList tags) {
 
@@ -503,34 +490,16 @@ void ImageProvider::setDataImage(const QModelIndex &parent, QString path, QStrin
     childWrapper->data->tags = tags;
 }
 
-void ImageProvider::addImage(qint64 semesterNumber, QString courseName, QString themeName, QString path, QString comments, QStringList tags) {
-    qDebug() << "addImage";
+void ImageProvider::addImage(QString path, QString comments, QStringList tags) {
+    if (!this->currentIndex.isValid()) return;
 
-    if (!containsSemesterAlready(root.children, semesterNumber)) {
-        qDebug() << "not contains semester";
-        addSemester(semesterNumber);
-    }
+    qDebug() << "add image";
 
-    DataWrapper* semesterPtr = this->findFromNumber(root.children, semesterNumber);
-    QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
-    if (!containsCourseAlready(semesterPtr->children, courseName)) {
-        qDebug() << "not contains course";
-        addCourse(semesterNumber, courseName);
-    }
-
-    DataWrapper* coursePtr = this->findFromName(root.children[semesterPtr->row]->children, courseName);
-    QModelIndex courseIndex = index(coursePtr->row, 0, semesterIndex);
-    if (!containsCourseAlready(coursePtr->children, themeName)) {
-        qDebug() << "not contains theme";
-        addTheme(semesterNumber, courseName, themeName);
-    }
-
-    DataWrapper* themePtr = this->findFromName(root.children[semesterPtr->row]->children[coursePtr->row]->children, themeName);
-    QModelIndex themeIndex = index(themePtr->row, 0, courseIndex);
-    if (containsPathAlready(themePtr->children, path)) {
-        qDebug() << "contains image already";
-        return;
-    }
+    DataWrapper* ptr = dataForIndex(this->currentIndex);
+    if (containsPathAlready(ptr->children, path)) {
+            qDebug() << "contains image already";
+            return;
+        }
 
     dbData data;
     data.comments = comments;
@@ -539,13 +508,12 @@ void ImageProvider::addImage(qint64 semesterNumber, QString courseName, QString 
 
     QVariant param = QVariant::fromValue(data);
 
-    insertRows(this->rowCount(themeIndex), 1, themeIndex);
+    insertRows(this->rowCount(this->currentIndex), 1, this->currentIndex);
 
-    QModelIndex index = createIndex(this->rowCount(themeIndex), 0,
-                                    dataForIndex(themeIndex)->children[this->rowCount(themeIndex)-1]);
+    QModelIndex index = createIndex(this->rowCount(this->currentIndex), 0,
+                                    ptr->children[this->rowCount(this->currentIndex)-1]);
     this->setData(index, param, Qt::EditRole);
 }
-
 
 bool ImageProvider::removeRows(int row, int count, const QModelIndex &parent) {
 
@@ -573,133 +541,53 @@ bool ImageProvider::removeRows(int row, int count, const QModelIndex &parent) {
     return true;
 }
 
-void ImageProvider::deleteImage(qint64 semesterNumber, QString courseName, QString themeName, QString path) {
-    qDebug() << "Delete image";
 
-    DataWrapper* semesterPtr = findFromNumber(root.children, semesterNumber);
-    if (semesterPtr == nullptr) {
-        qDebug() << "No such semester";
-        return;
-    }
-//    QModelIndex rootIndex = createIndex(0, 0, &root);
-    QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
-//    this->fetchMoreWithoutShowing(semesterIndex);
+void ImageProvider::deleteItem() {
+    if (!this->currentIndex.isValid()) return;
 
-    DataWrapper* coursePtr = findFromName(semesterPtr->children, courseName);
-    if (coursePtr == nullptr) {
-        qDebug() << "No such course";
-        return;
-    }
-    QModelIndex courseIndex = index(coursePtr->row, 0, semesterIndex);
-//    this->fetchMoreWithoutShowing(courseIndex);
+    this->fetchMore(this->currentIndex);
 
-    DataWrapper* themePtr = findFromName(coursePtr->children, themeName);
-    if (themePtr == nullptr) {
-        qDebug() << "No such theme";
-        return;
-    }
-    QModelIndex themeIndex = index(themePtr->row, 0, courseIndex);
-//    this->fetchMoreWithoutShowing(themeIndex);
+    DataWrapper* ptr = dataForIndex(this->currentIndex);
+    qDebug() << "delete" << ptr->type << "number" << ptr->number;
 
-    DataWrapper* imagePtr = findFromPath(themePtr->children, path);
-    if (imagePtr == nullptr) {
-        qDebug() << "No such image";
-        return;
-    }
+    QModelIndex parent = this->currentIndex.parent();
+    if (ptr->type == SEMESTER)
+        parent = QModelIndex();
 
-    removeDataFromDb(imagePtr->id);
+    if (ptr->childrenCount > 0) {
 
-    this->removeRows(imagePtr->row, 1, themeIndex);
-}
+        DataWrapper* firstLevelSon;
+        DataWrapper* secondLevelSon;
+        QModelIndex firstLevelIndex, secondlevelIndex;
 
-void ImageProvider::deleteTheme(qint64 semesterNumber, QString courseName, QString themeName) {
-    qDebug() << "Delete theme";
+        for (qint64 i = 0; i < ptr->children.size(); ++i) {
+            firstLevelSon = ptr->children[i];
+            firstLevelIndex = index(firstLevelSon->row, 0, this->currentIndex);
+            this->fetchMore(firstLevelIndex);
 
-    DataWrapper* semesterPtr = findFromNumber(root.children, semesterNumber);
-    if (semesterPtr == nullptr) {
-        qDebug() << "No such semester";
-        return;
-    }
-//    QModelIndex rootIndex = createIndex(0, 0, &root);
-    QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
-//    this->fetchMoreWithoutShowing(semesterIndex);
+            if (firstLevelSon->childrenCount > 0) {
+                for (qint64 j = 0; j < firstLevelSon->children.size(); ++j) {
+                    secondLevelSon = firstLevelSon->children[j];
+                    secondlevelIndex = index(secondLevelSon->row, 0, firstLevelIndex);
+                    this->fetchMore(secondlevelIndex);
 
-    DataWrapper* coursePtr = findFromName(semesterPtr->children, courseName);
-    if (coursePtr == nullptr) {
-        qDebug() << "No such course";
-        return;
-    }
-    QModelIndex courseIndex = index(coursePtr->row, 0, semesterIndex);
-//    this->fetchMoreWithoutShowing(courseIndex);
+                    removeRows(0, secondLevelSon->childrenCount, secondlevelIndex);
+                    for (qint64 k = 0; k < secondLevelSon->children.size(); ++k)
+                        removeDataFromDb(secondLevelSon->children[k]->id);
 
-    DataWrapper* themePtr = findFromName(coursePtr->children, themeName);
-    if (themePtr == nullptr) {
-        qDebug() << "No such theme";
-        return;
-    }
+                    removeDataFromDb(secondLevelSon->id);
+                }
 
-    removeDataFromDb(themePtr->id);
+                removeRows(0, firstLevelSon->childrenCount, firstLevelIndex);
+            }
 
-    this->removeRows(themePtr->row, 1, courseIndex);
-}
-
-void ImageProvider::deleteCourse(qint64 semesterNumber, QString courseName) {
-    qDebug() << "Delete course " << courseName;
-
-    DataWrapper* semesterPtr = findFromNumber(root.children, semesterNumber);
-    if (semesterPtr == nullptr) {
-        qDebug() << "No such semester";
-        return;
-    }
-    QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
-//    this->fetchMoreWithoutShowing(semesterIndex);
-
-    DataWrapper* coursePtr = findFromName(semesterPtr->children, courseName);
-    if (coursePtr == nullptr) {
-        qDebug() << "No such course";
-        return;
-    }
-    QModelIndex courseIndex = index(coursePtr->row, 0, semesterIndex);
-
-    this->removeRows(0, coursePtr->childrenCount, courseIndex);
-    for (int i = 0; i < coursePtr->children.size(); ++i) {
-        removeDataFromDb(coursePtr->children[i]->id);
-    }
-
-    removeDataFromDb(coursePtr->id);
-    this->removeRows(coursePtr->row, 1, semesterIndex);
-}
-
-void ImageProvider::deleteSemester(qint64 semesterNumber) {
-    qDebug() << "Delete semester " << semesterNumber;
-
-    DataWrapper* semesterPtr = findFromNumber(root.children, semesterNumber);
-    if (semesterPtr == nullptr) {
-        qDebug() << "No such semester";
-        return;
-    }
-    qDebug() << "With row" << semesterPtr->row;
-    QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
-
-    DataWrapper* coursePtr;
-    for (qint64 i = 0; i < semesterPtr->children.size(); ++i) {
-        coursePtr = semesterPtr->children[i];
-        QModelIndex courseIndex = index(coursePtr->row, 0, semesterIndex);
-
-        this->removeRows(0, coursePtr->childrenCount, courseIndex);
-        for (qint64 j = 0; j < coursePtr->children.size(); ++j) {
-            removeDataFromDb(coursePtr->children[j]->id);
+            removeRows(0, ptr->childrenCount, this->currentIndex);
+            removeDataFromDb(firstLevelSon->id);
         }
-
-        removeDataFromDb(coursePtr->id);
     }
-    this->removeRows(0, semesterPtr->childrenCount, semesterIndex);
 
-    this->removeRows(semesterPtr->row, 1, QModelIndex());
-    removeDataFromDb(semesterPtr->id);
-
-    beginResetModel();
-    endResetModel();
+    removeRows(ptr->row, 1, parent);
+    removeDataFromDb(ptr->id);
 }
 
 void ImageProvider::removeDataFromDb(qint64 id) {
@@ -762,6 +650,12 @@ void ImageProvider::setComment(qint64 semesterNumber, QString courseName, QStrin
     DataWrapper* imagePtr = findFromPath(themePtr->children, path);
 
     imagePtr->data->comments = comment;
+}
+
+void ImageProvider::setCurrentIndex (const QModelIndex &currentIndex) {
+    this->currentIndex = currentIndex;
+    DataWrapper* ptr = dataForIndex(this->currentIndex);
+    qDebug() << ptr->data->comments;
 }
 
 //private functions
