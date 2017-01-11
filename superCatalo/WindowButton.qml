@@ -19,7 +19,7 @@ Rectangle
     // Действует в пределах всего элемента Image
     anchors.fill: parent
     id: mouseArea
-    onClicked: callback()
+    onClicked: callbackClose()
   }
 
   states:[

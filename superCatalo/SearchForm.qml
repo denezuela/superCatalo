@@ -1,8 +1,11 @@
 import QtQuick 2.5
 import QtQuick.Controls 1.4
+import QtQuick.Controls.Styles 1.4
+import QtGraphicalEffects 1.0
 
-Item {
-    Rectangle {
+Rectangle {
+    width: 700
+    height: 550
         gradient: Gradient {
             GradientStop {
                 position: 0.02
@@ -20,13 +23,6 @@ Item {
             }
         }
         anchors.fill: parent
-}
-    WindowButton
-    {
-      // Кнопка закрытия окна
-      id: button_close
-      anchors.right: parent.right
-      anchors.rightMargin: 5
-      function callbackClose() {Qt.quit()}
-    }
+
+
 }

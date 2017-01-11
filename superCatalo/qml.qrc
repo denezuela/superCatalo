@@ -3,9 +3,11 @@
         <file>main.qml</file>
         <file>StartForm.qml</file>
         <file>WindowButton.qml</file>
+        <file>WindowAdd.qml</file>
     </qresource>
     <qresource prefix="/image">
         <file>close.png</file>
         <file>print.png</file>
+        <file>search.png</file>
     </qresource>
 </RCC>
