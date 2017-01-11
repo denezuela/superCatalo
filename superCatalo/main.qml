@@ -98,23 +98,7 @@ ApplicationWindow {
 
             }
         }
-        Menu {
-            title: qsTr("Печать")
-            MenuItem {
-                text: qsTr("&Печать изображения")
-            }
-            MenuItem {
-                text: qsTr("&Печать со свойствами") //печать нужных тем,номер изобр. на странице
-            }
-
-        }
-        Menu {
-            title: "Выход"
-            //onTriggered: Qt.quit();
-
-        }
     }
-
 
 TreeView {
         id: treeView
@@ -132,17 +116,12 @@ TreeView {
         TableViewColumn{
                     title:"Структура"
                     role: "display"
-                    width:300 //появляется прокрутка
+                    width:500 //появляется прокрутка
         }
-            TableViewColumn{
-                        title:"Структура"
-                        role: "display"
-                        width:300 //появляется прокрутка
-            }
             MouseArea {
                 id: mouseArea_tree
                 anchors.topMargin: 0
-                anchors.bottomMargin: 0
+                anchors.bottomMargin: 30 //нижнее поле
                 anchors.fill: parent
                 acceptedButtons: Qt.RightButton | Qt.LeftButton
                 onClicked:
@@ -156,7 +135,7 @@ TreeView {
                     if (mouse.button === Qt.RightButton)
                     {
                         var index_2 = parent.indexAt(mouse.x, mouse.y);
-                        mymodel.setCurrentIndex(index_2);
+                        mymodel.setCurrentIndex(index_2); //!!!
                         if (index_2.valid) menu_a.popup();
                 }
                 }
@@ -167,7 +146,8 @@ TreeView {
                     {
                         image.source = mymodel.data(index_image,1);
                         slider_image.visible = true;
-                        slider_rotation.visible=true;
+                        button_print.visible=true;
+                        //slider_rotation.visible=true;
                     }
                 }
             }
@@ -176,13 +156,17 @@ TreeView {
     Image {
         id: image
         anchors.left: treeView.right
-        anchors.leftMargin: 8
-        anchors.top: slider_rotation.bottom
+        anchors.leftMargin: 10
+        anchors.top: slider_image.bottom
         anchors.right:parent.right
-        anchors.rightMargin: 8
+        anchors.rightMargin: 24
         anchors.bottom: treeView.bottom
-        scale: slider_image.value
-        rotation: slider_rotation.value*360
+
+        fillMode: Image.PreserveAspectFit //изображение масштабируется равномерно, чтобы соответствовать без кадрирования
+        smooth: true
+
+        ///scale: slider_image.value //масштаб
+        //rotation: slider_rotation.value*360
 
         MouseArea {
             // действуем в пределах всего элемента Image
@@ -191,33 +175,54 @@ TreeView {
         }
     }
 
-    Slider {
-        id: slider_rotation
-        x: 553
-        y: 11
-        anchors.left:treeView.right
-        anchors.leftMargin: 8
-        width: 100
-        height: 20
-        stepSize: 0.001
-        visible: false
-        onEnabledChanged: {
-            image.rotation = slider_rotation.value;
-        }
-    }
+//    Slider {
+//        id: slider_rotation
+//        anchors.left:treeView.right
+//        anchors.leftMargin: 10
+//        anchors.top: treeView.top
+//        width: 100
+//        height: 20
+//        stepSize: 0.001
+//        visible: false
+//        onEnabledChanged: {
+//            image.rotation = slider_rotation.value;
+//        }
+//    }
 
     Slider {
         id: slider_image
-        x: 447
-        y: 11
-        anchors.left: slider_rotation.right
-        anchors.leftMargin: 5
+        anchors.left:treeView.right
+        anchors.leftMargin: 10
+        anchors.top: treeView.top
         width: 100
         height: 20
         value: 0.5
         maximumValue: 1
         visible: false
     }
+
+Button {
+    id: button_print
+    anchors.left: slider_image.right
+    anchors.leftMargin: 10
+    width: 27
+    height: 27
+    style:
+     ButtonStyle {
+        background: Rectangle {
+                     color: "#4ea9cc"
+                     border.color: "#3877a8"
+                     radius: 4
+                     Image {
+                         width: 27;height: 27
+                         source: "image/print.png"
+                     }
+        }
+                        }
+    //iconSource:"image/print.png"
+    onClicked:mymodel.print(image.source)
+    visible: false
+}
 
     Rectangle {
         id: item_addsemester
@@ -227,6 +232,8 @@ TreeView {
         visible: false
         color: "#398eb1"
         border.width: 1
+        border.color: "#3877a8"
+        radius: 8
 
         TextField {
             x: 66
@@ -248,15 +255,13 @@ TreeView {
                 textField_numsemester1.text="";
                }
         }
-
-        Button {
-            id: button1_close
-            x: 348
-            y: 1
-            width: 28
-            height: 27
-            iconSource: "images/close.png"
-            onClicked: item_addsemester.visible=false
+        WindowButton
+        {
+          anchors.right: parent.right
+          anchors.rightMargin: 3
+          anchors.top: parent.top
+          anchors.topMargin: 3
+          function callback() {item_addsemester.visible=false}
         }
     }
 
@@ -268,6 +273,8 @@ TreeView {
         visible: false
         color: "#398eb1"
         border.width: 1
+        border.color: "#3877a8"
+        radius: 8
 
         TextField {
             x: 64
@@ -296,15 +303,13 @@ TreeView {
                 textField_numsemester2.text=""; textField_namecourse2.text="";
                }
         }
-
-        Button {
-            id: button2_close
-            x: 341
-            y: 8
-            width: 28
-            height: 27
-            iconSource: "images/close.png"
-            onClicked: item_addcourse.visible=false
+        WindowButton
+        {
+          anchors.right: parent.right
+          anchors.rightMargin: 3
+          anchors.top: parent.top
+          anchors.topMargin: 3
+          function callback() {item_addcourse.visible=false}
         }
     }
 
@@ -316,6 +321,8 @@ TreeView {
         visible: false
         color: "#398eb1"
         border.width: 1
+        border.color: "#3877a8"
+        radius: 8
 
         TextField {
             x: 64
@@ -353,17 +360,14 @@ TreeView {
                 textField_numsemester3.text="";textField_namecourse3.text="";textField_nametheme3.text="";
                }
         }
-
-        Button {
-            id: button3_close
-            x: 336
-            y: 8
-            width: 28
-            height: 27
-            iconSource: "images/close.png"
-            onClicked: item_addtheme.visible=false
+        WindowButton
+        {
+          anchors.right: parent.right
+          anchors.rightMargin: 3
+          anchors.top: parent.top
+          anchors.topMargin: 3
+          function callback() {item_addtheme.visible=false}
         }
-
     }
 
     Rectangle {
@@ -373,6 +377,8 @@ TreeView {
         height: 270
         color: "#398eb1"
         border.width: 1
+        border.color: "#3877a8"
+        radius: 8
         visible: false
 
         TextField {
@@ -474,48 +480,27 @@ TreeView {
             item_addimage.visible=false;
            }
         }
-
-        Button {
-            id: button4_close
-            anchors.right: parent.right
-            width: 27
-            height: 27
-            iconSource: "images/close.png"
-            onClicked: item_addimage.visible=false
+        WindowButton
+        {
+          anchors.right: parent.right
+          anchors.rightMargin: 3
+          anchors.top: parent.top
+          anchors.topMargin: 3
+          function callback() {item_addimage.visible=false}
         }
     }
 
-    Rectangle {
+
+   Rectangle {
         id: item_delsemester
-        x: 132
-        y: 160
+        anchors.centerIn: parent
         width: 377
         height: 132
         visible: false
-        color: "#7bb8d1"
+        color: "#398eb1"
         border.width: 1
-
-        Button {
-            id: button11_ok
-            x: 151
-            y: 82
-            text: qsTr("ОК")
-            onClicked: {
-                mymodel.deleteSemester(textField_numsemester11.text);
-                item_delsemester.visible=false;
-               }
-        }
-
-        Button {
-            id: button11_close
-            x: 348
-            y: 1
-            width: 28
-            height: 27
-            iconSource: "images/close.png"
-            //iconSource: "close.png"
-            onClicked: item_delsemester.visible=false
-        }
+        border.color: "#3877a8"
+        radius: 8
 
         TextField {
             x: 66
@@ -525,37 +510,37 @@ TreeView {
             id: textField_numsemester11
             placeholderText: qsTr("Введите номер семестра")
         }
+        Button {
+            id: button11_ok
+            x: 151
+            y: 82
+            text: qsTr("ОК")
+            onClicked: {
+                mymodel.deleteSemester(textField_numsemester11.text);
+                item_delsemester.visible=false;
+                textField_numsemester11.text="";
+               }
+        }
+        WindowButton
+        {
+          anchors.right: parent.right
+          anchors.rightMargin: 3
+          anchors.top: parent.top
+          anchors.topMargin: 3
+          function callback() {item_delsemester.visible=false}
+        }
     }
 
-    Rectangle {
+   Rectangle {
         id: item_delcourse
-        x: 132
-        y: 160
+        anchors.centerIn: parent
         width: 377
         height: 184
         visible: false
-        color: "#7bb8d1"
+        color: "#398eb1"
         border.width: 1
-
-        Button {
-            id: button22_ok
-            x: 149
-            y: 130
-            text: qsTr("ОК")
-            onClicked: {
-                mymodel.deleteCourse(textField_numsemester22.text,textField_namecourse22.text);
-                item_delcourse.visible=false;
-               }
-        }
-
-        Button {
-            id: button22_close
-            x: 341
-            y: 8
-            width: 28
-            height: 27
-            onClicked: item_delcourse.visible=false
-        }
+        border.color: "#3877a8"
+        radius: 8
 
         TextField {
             x: 64
@@ -574,68 +559,200 @@ TreeView {
             placeholderText: qsTr("Введите название курса")
         }
 
-    }
-
-    Rectangle {
-        id: item_deltheme
-        x: 132
-        y: 136
-        width: 377
-        height: 208
-        visible: false
-        color: "#7bb8d1"
-        border.width: 1
-
         Button {
-            id: button33_ok
+            id: button22_ok
             x: 149
-            y: 169
+            y: 130
             text: qsTr("ОК")
             onClicked: {
-                mymodel.deleteTheme(textField_numsemester33.text,textField_namecourse33.text,textField_nametheme33.text);
-                item_deltheme.visible=false;
+                mymodel.deleteCourse(textField_numsemester22.text,textField_namecourse22.text);
+                item_delcourse.visible=false;
+                textField_numsemester22.text="";textField_namecourse22.text="";
                }
         }
-
-        Button {
-            id: button33_close
-            x: 341
-            y: 8
-            width: 28
-            height: 27
-            onClicked: item_deltheme.visible=false
-            iconSource: "/images/close.png"
-            //iconSource: "/images/delete.svg"
+        WindowButton
+        {
+          anchors.right: parent.right
+          anchors.rightMargin: 3
+          anchors.top: parent.top
+          anchors.topMargin: 3
+          function callback() {item_delcourse.visible=false}
         }
+    }
 
+   Rectangle {
+    id: item_deltheme
+    anchors.centerIn: parent
+    width: 377
+    height: 208
+    visible: false
+    color: "#398eb1"
+    border.width: 1
+    border.color: "#3877a8"
+    radius: 8
 
-        TextField {
-            x: 64
-            y: 30
-            width: 250
-            height: 33
-            id: textField_numsemester33
-            placeholderText: qsTr("Введите номер семестра")
-        }
-        TextField {
-            x: 64
-            y: 80
-            width: 250
-            height: 33
-            id: textField_namecourse33
-            placeholderText: qsTr("Введите название предмета")
-        }
+    TextField {
+        x: 64
+        y: 30
+        width: 250
+        height: 33
+        id: textField_numsemester33
+        placeholderText: qsTr("Введите номер семестра")
+    }
+    TextField {
+        x: 64
+        y: 80
+        width: 250
+        height: 33
+        id: textField_namecourse33
+        placeholderText: qsTr("Введите название предмета")
+    }
 
-        TextField {
-            x: 64
-            y: 130
-            width: 250
-            height: 33
-            id: textField_nametheme33
-            placeholderText: qsTr("Введите название темы")
+    TextField {
+        x: 64
+        y: 130
+        width: 250
+        height: 33
+        id: textField_nametheme33
+        placeholderText: qsTr("Введите название темы")
+    }
+    Button {
+        id: button33_ok
+        x: 149
+        y: 169
+        text: qsTr("ОК")
+        onClicked: {
+            mymodel.deleteTheme(textField_numsemester33.text,textField_namecourse33.text,textField_nametheme33.text);
+            item_deltheme.visible=false;
+            textField_numsemester33.text="";textField_namecourse33.text="";textField_nametheme33.text="";
+           }
+    }
+    WindowButton
+    {
+      anchors.right: parent.right
+      anchors.rightMargin: 3
+      anchors.top: parent.top
+      anchors.topMargin: 3
+      function callback() {item_deltheme.visible=false}
+    }
+}
+Rectangle {
+    id: item_delimage
+    anchors.centerIn: parent
+    width: 402
+    height: 270
+    color: "#398eb1"
+    border.width: 1
+    border.color: "#3877a8"
+    radius: 8
+    visible: false
+
+    TextField {
+        id: textField_numsemester44
+        x: 76
+        y: 10
+        width: 250
+        height: 33
+        placeholderText: qsTr("Введите номер семестра")
+    }
+
+    TextField {
+        id: textField_namecourse44
+        x: 76
+        y: 55
+        width: 250
+        height: 33
+        placeholderText: qsTr("Введите название предмета")
+    }
+
+    TextField {
+        id: textField_nametheme44
+        x: 76
+        y: 100
+        width: 250
+        height: 33
+        placeholderText: qsTr("Введите название темы")
+    }
+
+    TextField {
+        id: textField_path2
+        x: 76
+        y: 145
+        width: 250
+        height: 33
+        placeholderText: qsTr("Путь к изображению")
+
+        MouseArea {
+            anchors.fill: parent
+            id: mouseArea_path2
+
+            onDoubleClicked: {
+                fileDialog.visible = true;
+            }
         }
+    }
+
+    FileDialog {
+                        id: fileDialog2
+                        title: "Выбор изображения"
+                        folder: shortcuts.home
+                        visible: false
+                        nameFilters: [ "Изображения (*.jpg *.png *.bmp *gif)", "Все файлы (*)" ]
+                        selectedNameFilter: "Изображения (*.jpg *.png *.bmp *gif)"
+                        onAccepted: {
+                            textField_path2.text=(fileDialog2.fileUrl.toString()).slice(7);
+                        }
+                        //onRejected: { console.log("Rejected")}
+
 
     }
+//    TextField {
+//           id: textField_imagecomment2
+//           x: 76
+//           y: 190
+//           width: 250
+//           height: 33
+//           placeholderText: qsTr("Введите комментарий")
+//   }
+
+    Button {
+        id:buttonbrowse2
+        width: 70
+        height: 33
+        anchors.left: textField_path2.right
+        anchors.bottom: textField_path2.bottom
+        anchors.leftMargin: 2
+        text:"Browse"
+        visible: true
+        style:  ButtonStyle {
+            background: Rectangle{
+                color: control.pressed ? "#2bb2eb"  : "#398eb1"
+                border.color: "#ffffff"
+                radius: 5
+            }
+    }
+     onClicked: fileDialog.open()
+    }
+
+    Button {
+        id: button44_ok
+        x: 161
+        y: 230
+        text: qsTr("ОК")
+        onClicked: {
+        mymodel.addImage(textField_numsemester44.text,textField_namecourse44.text,textField_nametheme44.text,textField_path2.text);
+        item_delimage.visible=false;
+       }
+    }
+    WindowButton
+    {
+      anchors.right: parent.right
+      anchors.rightMargin: 3
+      anchors.top: parent.top
+      anchors.topMargin: 3
+      function callback() {item_delimage.visible=false}
+    }
+}
 
 }
 

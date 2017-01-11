@@ -1,10 +1,19 @@
 import QtQuick 2.5
 
-Image
+Rectangle
 {
   id: button
-  width: 25
-  height: 25
+  width: 24
+  height: 24
+  color: "#4ea9cc"
+  border.color: "#3877a8"
+  radius: 10
+
+  Image {
+      width: 24;
+      height: 24;
+      source: "image/close.png"
+  }
   MouseArea
   {
     // Действует в пределах всего элемента Image
@@ -31,11 +40,6 @@ Image
       PropertyChanges { target: button; opacity: 1; }
     }
    ]
-//  Behavior on opacity
-//  {
-//    // Анимация с шагом в 100 миллисекунд
-//    // Раз в 100 миллисекунд прозрачность будет изменяться на 0,1
-//    NumberAnimation { duration: 100 }
-//  }
+
 }
 

@@ -101,11 +101,10 @@ Item {
     {
       // Кнопка закрытия окна
       id: button_close
-      x:604
-      y:2
       anchors.right: parent.right
-      source: "/images/close.png";
+      anchors.rightMargin: 5
       function callback() {Qt.quit();}
     }
+
 
 }

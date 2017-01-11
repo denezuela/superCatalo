@@ -6,12 +6,16 @@
 #include <QPixmap>
 #include <QUrl>
 #include <QSize>
+#include <QPrinter>
+#include <QPainter>
+#include <QPrintDialog>
+#include <QPixmap>
 
 ImageProvider::ImageProvider(QAbstractItemModel *parent) : QAbstractItemModel(parent)
 {
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setHostName("localhost");
-    db.setDatabaseName("/home/skt/sqlite/db");
+    db.setDatabaseName("/home/skt/sqlite/DB");
     bool db_ok = db.open();
     if (!db_ok) {
         qDebug() << "Database error";
@@ -790,3 +794,16 @@ void ImageProvider::fetchMoreWithoutShowing(const QModelIndex &parent) {
     }
 }
 
+void ImageProvider::print(QUrl data)
+
+{
+    QPixmap pix;
+    pix.load(data.toLocalFile());
+    QPrinter printer;
+          QPrintDialog *dlg = new QPrintDialog(&printer,0);
+          if(dlg->exec() == QDialog::Accepted) {
+                  QPainter painter(&printer);
+                  painter.drawPixmap(QPoint(0, 0), pix);
+                  painter.end();
+          }
+}

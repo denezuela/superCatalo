@@ -92,7 +92,7 @@ Q_INVOKABLE  void addTheme(QString themeName);
 Q_INVOKABLE  void addTags(qint64 semesterNumber, QString courseName, QString themeName, QString path, QStringList tags);
 Q_INVOKABLE  void setComment(qint64 semesterNumber, QString courseName, QString themeName, QString path, QString comment);
 
-
+Q_INVOKABLE void print(QUrl data);
 
 
    signals:
