@@ -628,6 +628,25 @@ void ImageProvider::setCurrentIndex (const QModelIndex &currentIndex) {
     qDebug() << ptr->data->comments;
 }
 
+QString ImageProvider::showTags() {
+    if (!this->currentIndex.isValid()) return "NO_TAGS";
+
+    DataWrapper* imagePtr = dataForIndex(this->currentIndex);
+    if (imagePtr->type != IMAGE)
+        return "NO_TAGS";
+
+    return imagePtr->data->tags.join(",");
+}
+
+QString ImageProvider::showComment() {
+    if (!this->currentIndex.isValid()) return "NO_COMMENT";
+
+    DataWrapper* imagePtr = dataForIndex(this->currentIndex);
+    if (imagePtr->type != IMAGE)
+        return "NO_COMMENT";
+
+    return imagePtr->data->comments;
+}
 //private functions
 
 bool ImageProvider::containsSemesterAlready (QList<DataWrapper*> children, qint64 number) {

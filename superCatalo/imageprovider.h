@@ -92,6 +92,8 @@ Q_INVOKABLE  void addTheme(QString themeName);
 Q_INVOKABLE  void addTags(QString tags);
 Q_INVOKABLE  void setComment(QString comment);
 
+Q_INVOKABLE  QString showTags();
+Q_INVOKABLE  QString showComment();
 Q_INVOKABLE void print(QUrl data);
 
 
