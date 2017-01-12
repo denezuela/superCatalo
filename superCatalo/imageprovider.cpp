@@ -625,16 +625,16 @@ void ImageProvider::setComment(QString comment) {
 qint64 ImageProvider::setCurrentIndex (const QModelIndex &currentIndex) {
     this->currentIndex = currentIndex;
     DataWrapper* ptr = dataForIndex(this->currentIndex);
-    qDebug() << ptr->data->comments;
+//    qDebug() << ptr->data->comments;
 
-    if (ptr->type == SEMESTER)
-        return 1;
-    else if (ptr->type == COURSE)
-        return 2;
-    else if (ptr->type == THEME)
-        return 3;
-    if (ptr->type == IMAGE)
-        return 4;
+    return ptr->type;
+}
+
+bool ImageProvider::showMenuItem (const QModelIndex &index, qint64 type) {
+    if (!index.isValid()) return false;
+
+    DataWrapper* ptr = dataForIndex(index);
+    return (ptr->type == type);
 }
 
 QString ImageProvider::showTags() {

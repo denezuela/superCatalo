@@ -77,6 +77,7 @@ class ImageProvider : public QAbstractItemModel
         bool hasChildren(const QModelIndex &parent) const;
 
 Q_INVOKABLE  qint64 setCurrentIndex (const QModelIndex &currentIndex);
+Q_INVOKABLE  bool showMenuItem (const QModelIndex &index, qint64 type);
 Q_INVOKABLE  void deleteItem();
 
 Q_INVOKABLE  void addImage(QString path, QString comments = "", QString tags = "");
