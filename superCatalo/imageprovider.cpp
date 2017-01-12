@@ -494,7 +494,7 @@ void ImageProvider::setDataImage(const QModelIndex &parent, QString path, QStrin
     childWrapper->data->tags = tags;
 }
 
-void ImageProvider::addImage(QString path, QString comments, QStringList tags) {
+void ImageProvider::addImage(QString path, QString comments, QString tags) {
     if (!this->currentIndex.isValid()) return;
 
     qDebug() << "add image";
@@ -508,7 +508,7 @@ void ImageProvider::addImage(QString path, QString comments, QStringList tags) {
     dbData data;
     data.comments = comments;
     data.path = path;
-    data.tags = tags;
+    data.tags = tags.split(',');
 
     QVariant param = QVariant::fromValue(data);
 
@@ -602,56 +602,22 @@ void ImageProvider::removeDataFromDb(qint64 id) {
     queryForDelete.next();
 }
 
-void ImageProvider::addTags(qint64 semesterNumber, QString courseName, QString themeName, QString path, QStringList tags) {
-    DataWrapper* semesterPtr = findFromNumber(root.children, semesterNumber);
-    if (semesterPtr == nullptr) {
-        qDebug() << "No such semester";
+void ImageProvider::addTags(QString tags) {
+    if (!this->currentIndex.isValid()) return;
+
+    DataWrapper* imagePtr = dataForIndex(this->currentIndex);
+    if (imagePtr->type != IMAGE)
         return;
-    }
-    QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
 
-    DataWrapper* coursePtr = findFromName(semesterPtr->children, courseName);
-    if (coursePtr == nullptr) {
-        qDebug() << "No such course";
-        return;
-    }
-    QModelIndex courseIndex = index(coursePtr->row, 0, semesterIndex);
-
-    DataWrapper* themePtr = findFromName(coursePtr->children, themeName);
-    if (themePtr == nullptr) {
-        qDebug() << "No such theme";
-        return;
-    }
-    QModelIndex themeIndex = index(themePtr->row, 0, courseIndex);
-
-    DataWrapper* imagePtr = findFromPath(themePtr->children, path);
-
-    imagePtr->data->tags.append(tags);
+    imagePtr->data->tags = tags.split(',');
 }
 
-void ImageProvider::setComment(qint64 semesterNumber, QString courseName, QString themeName, QString path, QString comment) {
-    DataWrapper* semesterPtr = findFromNumber(root.children, semesterNumber);
-    if (semesterPtr == nullptr) {
-        qDebug() << "No such semester";
-        return;
-    }
-    QModelIndex semesterIndex = index(semesterPtr->row, 0, QModelIndex());
+void ImageProvider::setComment(QString comment) {
+    if (!this->currentIndex.isValid()) return;
 
-    DataWrapper* coursePtr = findFromName(semesterPtr->children, courseName);
-    if (coursePtr == nullptr) {
-        qDebug() << "No such course";
+    DataWrapper* imagePtr = dataForIndex(this->currentIndex);
+    if (imagePtr->type != IMAGE)
         return;
-    }
-    QModelIndex courseIndex = index(coursePtr->row, 0, semesterIndex);
-
-    DataWrapper* themePtr = findFromName(coursePtr->children, themeName);
-    if (themePtr == nullptr) {
-        qDebug() << "No such theme";
-        return;
-    }
-    QModelIndex themeIndex = index(themePtr->row, 0, courseIndex);
-
-    DataWrapper* imagePtr = findFromPath(themePtr->children, path);
 
     imagePtr->data->comments = comment;
 }

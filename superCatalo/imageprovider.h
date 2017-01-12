@@ -79,7 +79,7 @@ class ImageProvider : public QAbstractItemModel
 Q_INVOKABLE  void setCurrentIndex (const QModelIndex &currentIndex);
 Q_INVOKABLE  void deleteItem();
 
-Q_INVOKABLE  void addImage(QString path, QString comments = "", QStringList tags = {});
+Q_INVOKABLE  void addImage(QString path, QString comments = "", QString tags = "");
 Q_INVOKABLE  void addSemester(qint64 semesterNumber);
 Q_INVOKABLE  void addCourse(QString courseName);
 Q_INVOKABLE  void addTheme(QString themeName);
@@ -89,8 +89,8 @@ Q_INVOKABLE  void addTheme(QString themeName);
 //Q_INVOKABLE  void deleteSemester(qint64 semesterNumber);
 //Q_INVOKABLE  void deleteTheme(qint64 semesterNumber, QString courseName, QString themeName);
 
-Q_INVOKABLE  void addTags(qint64 semesterNumber, QString courseName, QString themeName, QString path, QStringList tags);
-Q_INVOKABLE  void setComment(qint64 semesterNumber, QString courseName, QString themeName, QString path, QString comment);
+Q_INVOKABLE  void addTags(QString tags);
+Q_INVOKABLE  void setComment(QString comment);
 
 Q_INVOKABLE void print(QUrl data);
 
