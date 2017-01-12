@@ -622,10 +622,19 @@ void ImageProvider::setComment(QString comment) {
     imagePtr->data->comments = comment;
 }
 
-void ImageProvider::setCurrentIndex (const QModelIndex &currentIndex) {
+qint64 ImageProvider::setCurrentIndex (const QModelIndex &currentIndex) {
     this->currentIndex = currentIndex;
     DataWrapper* ptr = dataForIndex(this->currentIndex);
     qDebug() << ptr->data->comments;
+
+    if (ptr->type == SEMESTER)
+        return 1;
+    else if (ptr->type == COURSE)
+        return 2;
+    else if (ptr->type == THEME)
+        return 3;
+    if (ptr->type == IMAGE)
+        return 4;
 }
 
 QString ImageProvider::showTags() {

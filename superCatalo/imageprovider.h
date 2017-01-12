@@ -76,7 +76,7 @@ class ImageProvider : public QAbstractItemModel
         void removeDataFromDb(qint64 id);
         bool hasChildren(const QModelIndex &parent) const;
 
-Q_INVOKABLE  void setCurrentIndex (const QModelIndex &currentIndex);
+Q_INVOKABLE  qint64 setCurrentIndex (const QModelIndex &currentIndex);
 Q_INVOKABLE  void deleteItem();
 
 Q_INVOKABLE  void addImage(QString path, QString comments = "", QString tags = "");
