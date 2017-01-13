@@ -9,5 +9,6 @@
         <file>close.png</file>
         <file>print.png</file>
         <file>search.png</file>
+        <file>plus.png</file>
     </qresource>
 </RCC>

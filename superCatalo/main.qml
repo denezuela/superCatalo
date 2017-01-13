@@ -49,6 +49,17 @@ ApplicationWindow {
                     onTriggered: item_addimage.visible=true
                 }
                 MenuItem {
+                    id: addComment
+                    text: qsTr("&Добавить комментарий")
+                    onTriggered: item_addcomment.visible=true
+                }
+                MenuItem {
+                    id: addTag
+                    text: qsTr("&Добавить тег")
+                    onTriggered: item_addtag.visible=true
+                }
+
+                MenuItem {
                     text: qsTr("&Удалить элемент")
                     onTriggered: mymodel.deleteItem();
                 }
@@ -85,28 +96,50 @@ TreeView {
                 {
                     if (mouse.button === Qt.LeftButton)
                     {
-                        var index_1 = parent.indexAt(mouse.x, mouse.y);
+                        var index_1 = parent.indexAt(mouse.x, mouse.y)
                         if (index_1.valid)
-                        { parent.isExpanded(index_1) ? parent.collapse(index_1) : parent.expand(index_1);}
+                        { parent.isExpanded(index_1) ? parent.collapse(index_1) : parent.expand(index_1)}
+
+                        if(mymodel.data(index_1,1))
+                        {
+                            image.source = mymodel.data(index_1,1);
+                            //slider_image.visible = true;slider_rotation.visible=true;
+                            button_print.visible=true;
+                            mymodel.setCurrentIndex(index_1);
+                            textField_comment.visible=true;
+                            textField_comment.text="Комментарий: "+mymodel.showComment();
+
+                        }
                     }
                     if (mouse.button === Qt.RightButton)
                     {
-                        var index_2 = parent.indexAt(mouse.x, mouse.y);
-                        mymodel.setCurrentIndex(index_2); //!!!
-                        if (index_2.valid) menu_a.popup();
+                        var index_2 = parent.indexAt(mouse.x, mouse.y)
+                        if (index_2.valid) {
+                            addSemester.visible = mymodel.showMenuItem(index_2,1)
+                            addCourse.visible = mymodel.showMenuItem(index_2,1)
+                            addTheme.visible = mymodel.showMenuItem(index_2,2)
+                            addImage.visible = mymodel.showMenuItem(index_2,3)
+                            addComment.visible = mymodel.showMenuItem(index_2,4)
+                            addTag.visible = mymodel.showMenuItem(index_2,4)
+                            mymodel.setCurrentIndex(index_2)
+                            menu_a.popup()
+                        }
                 }
                 }
-                onDoubleClicked:
-                {
-                    var index_image = parent.indexAt(mouse.x, mouse.y);
-                    if(mymodel.data(index_image,1))
-                    {
-                        image.source = mymodel.data(index_image,1);
-                        //slider_image.visible = true;
-                        button_print.visible=true;
-                        //slider_rotation.visible=true;
-                    }
-                }
+//                onDoubleClicked:
+//                {
+//                    var index_image = parent.indexAt(mouse.x, mouse.y);
+//                    if(mymodel.data(index_image,1))
+//                    {
+//                        image.source = mymodel.data(index_image,1);
+//                        //slider_image.visible = true;slider_rotation.visible=true;
+//                        button_print.visible=true;
+//                        mymodel.setCurrentIndex(index_image);
+//                        textField_comment.visible=true;
+//                        textField_comment.text="Комментарий: "+mymodel.showComment();
+
+//                    }
+//                }
             }
         }
 
@@ -121,14 +154,21 @@ TreeView {
         fillMode: Image.PreserveAspectFit //изображение масштабируется равномерно, чтобы соответствовать без кадрирования
         smooth: true
 
-        ///scale: slider_image.value //масштаб
+        //scale: slider_image.value //масштаб
         //rotation: slider_rotation.value*360
-
         MouseArea {
-            // действуем в пределах всего элемента Image
             anchors.fill: parent
             id: mouseArea_image
         }
+    }
+
+    Text{
+           id: textField_comment
+           x: 312
+           y: 8
+           width: 250
+           height: 20
+           visible: false
     }
 
 //    Slider {
@@ -297,7 +337,28 @@ WindowAdd {
           id: button_ok
           x:150
           y:173
+          width: 80
+          height: 27
           text: qsTr("ОК")
+          style:
+              ButtonStyle {
+              background: Rectangle{
+                  color: "#23637a"
+                  border.color: "#23637a"
+                  radius: 4
+              }
+              label: Text {
+                  renderType: Text.NativeRendering
+                  verticalAlignment: Text.AlignVCenter
+                  horizontalAlignment: Text.AlignHCenter
+                  font.family: "Helvetica"
+                  font.pointSize: 12
+                  font.bold: true
+                  font.italic: true
+                  color: "black"
+                  text: control.text
+              }
+          }
           onClicked: {
               mymodel.addImage(textField_path.text,textField_imagecomment.text,textField_imagetads.text);
               item_addimage.visible=false;
@@ -309,10 +370,44 @@ WindowAdd {
     function callbackClose() { item_addimage.visible=false }
 }
 
+WindowAdd {
+   id: item_addcomment
+     TextField {
+        id: textField_newcomment
+        x: 66
+        y: 31
+        width: 250
+        height: 33
+        placeholderText: qsTr("Введите комментарий")
+       }
+    function callbackOK(){
+                        mymodel.setComment(textField_newcomment.text);
+                        item_addcomment.visible=false;
+                        textField_newcomment.text=""; }
+    function callbackClose() { item_addcomment.visible=false }
+}
+
+WindowAdd {
+   id: item_addtag
+     TextField {
+        id: textField_newtag
+        x: 66
+        y: 31
+        width: 250
+        height: 33
+        placeholderText: qsTr("Введите тег")
+       }
+    function callbackOK(){
+                        mymodel.setComment(textField_newtag.text);
+                        item_addtag.visible=false;
+                        textField_newtag.text=""; }
+    function callbackClose() { item_addtag.visible=false }
+}
+
 Button
 {
     id:button_search
-    anchors.left: treeView.right
+    anchors.left: button_add.right
     anchors.leftMargin: 10
     anchors.top: parent.top
     anchors.topMargin: 2
@@ -334,7 +429,30 @@ Button
     onClicked:{searchForm.visible=true;
     }
 }
-
+Button
+{
+    id:button_add
+    anchors.left: treeView.right
+    anchors.leftMargin: 10
+    anchors.top: parent.top
+    anchors.topMargin: 2
+    width: 24
+    height: 24
+    style:
+     ButtonStyle {
+        background:
+            Rectangle {
+                     color: "#4ea9cc"
+                     border.color: "#3877a8"
+                     radius: 4
+                     Image {
+                         width: 24;height: 24
+                         source: "image/plus.png"
+                     }
+        }
+}
+    onClicked:{item_addsemester.visible=true}
+}
 Rectangle{
     id:searchForm
     visible: false
