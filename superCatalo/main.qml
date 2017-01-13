@@ -98,7 +98,14 @@ TreeView {
                     {
                         var index_1 = parent.indexAt(mouse.x, mouse.y)
                         if (index_1.valid)
-                        { parent.isExpanded(index_1) ? parent.collapse(index_1) : parent.expand(index_1)}
+                        { if (parent.isExpanded(index_1)) {
+                                mymodel.setCurrentIndex(index_1);
+                                var indexes = mymodel.getChildrenIndexes();
+                                for (var i = indexes.length - 1; i >= 0; --i)
+                                    parent.collapse(indexes[i]);
+                            }
+                            else parent.expand(index_1)
+                        }
 
                         if(mymodel.data(index_1,1))
                         {

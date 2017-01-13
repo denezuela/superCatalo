@@ -76,7 +76,7 @@ class ImageProvider : public QAbstractItemModel
         void removeDataFromDb(qint64 id);
         bool hasChildren(const QModelIndex &parent) const;
 
-Q_INVOKABLE  qint64 setCurrentIndex (const QModelIndex &currentIndex);
+Q_INVOKABLE  void setCurrentIndex (const QModelIndex &currentIndex);
 Q_INVOKABLE  bool showMenuItem (const QModelIndex &index, qint64 type);
 Q_INVOKABLE  void deleteItem();
 
@@ -85,11 +85,6 @@ Q_INVOKABLE  void addSemester(qint64 semesterNumber);
 Q_INVOKABLE  void addCourse(QString courseName);
 Q_INVOKABLE  void addTheme(QString themeName);
 
-//Q_INVOKABLE  void deleteImage(qint64 semesterNumber, QString courseName, QString themeName, QString path);
-//Q_INVOKABLE  void deleteCourse(qint64 semesterNumber, QString courseName);
-//Q_INVOKABLE  void deleteSemester(qint64 semesterNumber);
-//Q_INVOKABLE  void deleteTheme(qint64 semesterNumber, QString courseName, QString themeName);
-
 Q_INVOKABLE  void addTags(QString tags);
 Q_INVOKABLE  void setComment(QString comment);
 
@@ -97,6 +92,7 @@ Q_INVOKABLE  QString showTags();
 Q_INVOKABLE  QString showComment();
 Q_INVOKABLE void print(QUrl data);
 
+Q_INVOKABLE QVariantList getChildrenIndexes();
 
    signals:
 

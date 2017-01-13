@@ -15,7 +15,7 @@ ImageProvider::ImageProvider(QAbstractItemModel *parent) : QAbstractItemModel(pa
 {
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setHostName("localhost");
-    db.setDatabaseName("/home/skt/sqlite/DB");
+    db.setDatabaseName("../DB");
     bool db_ok = db.open();
     if (!db_ok) {
         qDebug() << "Database error";
@@ -622,12 +622,9 @@ void ImageProvider::setComment(QString comment) {
     imagePtr->data->comments = comment;
 }
 
-qint64 ImageProvider::setCurrentIndex (const QModelIndex &currentIndex) {
+void ImageProvider::setCurrentIndex (const QModelIndex &currentIndex) {
     this->currentIndex = currentIndex;
     DataWrapper* ptr = dataForIndex(this->currentIndex);
-//    qDebug() << ptr->data->comments;
-
-    return ptr->type;
 }
 
 bool ImageProvider::showMenuItem (const QModelIndex &index, qint64 type) {
@@ -800,4 +797,42 @@ void ImageProvider::print(QUrl data)
                   painter.drawPixmap(QPoint(0, 0), pix);
                   painter.end();
           }
+}
+
+QVariantList ImageProvider::getChildrenIndexes() {
+    if (!this->currentIndex.isValid()) return {};
+
+    QVariantList indexes;
+    indexes.push_back(this->currentIndex);
+    DataWrapper* ptr = dataForIndex(this->currentIndex);
+
+    if (ptr->childrenCount > 0) {
+
+        QModelIndex firstLevelIndex, secondlevelIndex, thirdLevelIndex;
+        DataWrapper *firstLevelSon, *secondLevelSon, *thirdLevelSon;
+
+        for (qint64 i = 0; i < ptr->children.size(); ++i) {
+            firstLevelSon = ptr->children[i];
+            firstLevelIndex = index(firstLevelSon->row, 0, this->currentIndex);
+            indexes.push_back(firstLevelIndex);
+
+            if (firstLevelSon->childrenCount > 0) {
+                for (qint64 j = 0; j < firstLevelSon->children.size(); ++j) {
+                    secondLevelSon = firstLevelSon->children[j];
+                    secondlevelIndex = index(secondLevelSon->row, 0, firstLevelIndex);
+                    indexes.push_back(secondlevelIndex);
+
+                    if (secondLevelSon->childrenCount > 0) {
+                        for (qint64 k = 0; k < secondLevelSon->children.size(); ++k) {
+                            thirdLevelSon = firstLevelSon->children[j];
+                            thirdLevelIndex = index(thirdLevelSon->row, 0, firstLevelIndex);
+                            indexes.push_back(thirdLevelIndex);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return indexes;
 }
