@@ -49,7 +49,7 @@ class ImageProvider : public QAbstractItemModel
         DataWrapper* findFromName (QList<DataWrapper*> children, QString name);
         DataWrapper* findFromPath (QList<DataWrapper*> children, QString path);
         void recountRowNumbers(QList<DataWrapper*> children);
-        void fetchMoreWithoutShowing(const QModelIndex &parent);
+        bool include(const QStringList &big, const QStringList &small);
 
     public:
         ImageProvider(QAbstractItemModel *parent = 0);
@@ -93,6 +93,8 @@ Q_INVOKABLE  QString showComment();
 Q_INVOKABLE void print(QUrl data);
 
 Q_INVOKABLE QVariantList getChildrenIndexes();
+
+Q_INVOKABLE QVariantList findByTags (QString _tags);
 
    signals:
 
