@@ -318,7 +318,7 @@ void ImageProvider::setDataSemester(qint64 semesterNumber) {
 }
 
 void ImageProvider::addSemester(qint64 semesterNumber) {
-    if (!this->currentIndex.isValid()) return;
+    if (!this->currentIndex.isValid()) this->currentIndex = createIndex(0,0,&root);
 
     qDebug() << "addSemester";
     if (containsSemesterAlready(root.children, semesterNumber)) {
