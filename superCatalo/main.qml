@@ -61,7 +61,7 @@ ApplicationWindow {
 
                 MenuItem {
                     text: qsTr("&Удалить элемент")
-                    onTriggered: mymodel.deleteItem();
+                    onTriggered: { mymodel.deleteItem(); image.visible=false}
                 }
             }
     }
@@ -110,6 +110,7 @@ TreeView {
                         if(mymodel.data(index_1,1))
                         {
                             image.source = mymodel.data(index_1,1);
+                            image.visible=true;
                             //slider_image.visible = true;slider_rotation.visible=true;
                             button_print.visible=true;
                             mymodel.setCurrentIndex(index_1);
@@ -152,6 +153,7 @@ TreeView {
 
     Image {
         id: image
+        visible: true
         anchors.left: treeView.right
         anchors.leftMargin: 10
         anchors.top: button_search.bottom
