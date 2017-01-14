@@ -2,7 +2,13 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>StartForm.qml</file>
-        <file>images/delete.svg</file>
-        <file>images/close.png</file>
+        <file>WindowButton.qml</file>
+        <file>WindowAdd.qml</file>
+    </qresource>
+    <qresource prefix="/image">
+        <file>close.png</file>
+        <file>print.png</file>
+        <file>search.png</file>
+        <file>plus.png</file>
     </qresource>
 </RCC>

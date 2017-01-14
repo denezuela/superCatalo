@@ -8,6 +8,9 @@
 #include <QList>
 #include <QStringList>
 #include <QModelIndex>
+#include <QUrl>
+
+#include <QVariant>
 
 
 enum dataType {ROOT, SEMESTER, COURSE, THEME, IMAGE};
@@ -40,7 +43,7 @@ class ImageProvider : public QAbstractItemModel
     private:
         QSqlDatabase db;
         DataWrapper root{0, ROOT, nullptr, 0, 0, nullptr, {}, 0};
-
+        QModelIndex currentIndex;
         bool containsSemesterAlready (QList<DataWrapper*> children, qint64 number);
         bool containsCourseAlready (QList<DataWrapper*> children, QString comments);
         bool containsPathAlready (QList<DataWrapper*> children, QString path);
@@ -48,7 +51,7 @@ class ImageProvider : public QAbstractItemModel
         DataWrapper* findFromName (QList<DataWrapper*> children, QString name);
         DataWrapper* findFromPath (QList<DataWrapper*> children, QString path);
         void recountRowNumbers(QList<DataWrapper*> children);
-        void fetchMoreWithoutShowing(const QModelIndex &parent);
+        bool include(const QStringList &big, const QStringList &small);
 
     public:
         ImageProvider(QAbstractItemModel *parent = 0);
@@ -75,19 +78,27 @@ class ImageProvider : public QAbstractItemModel
         void removeDataFromDb(qint64 id);
         bool hasChildren(const QModelIndex &parent) const;
 
-Q_INVOKABLE  void addImage(qint64 semesterNumber, QString courseName, QString themeName, QString path, QString comments = "", QStringList tags = {});
+Q_INVOKABLE  void setCurrentIndex (const QModelIndex &currentIndex);
+Q_INVOKABLE  bool showMenuItem (const QModelIndex &index, qint64 type);
+Q_INVOKABLE  void deleteItem();
+
+Q_INVOKABLE  void addImage(QString path, QString comments = "", QString tags = "");
 Q_INVOKABLE  void addSemester(qint64 semesterNumber);
-Q_INVOKABLE  void addCourse(qint64 semesterNumber, QString courseName);
-Q_INVOKABLE  void addTheme(qint64 semesterNumber, QString courseName, QString themeName);
+Q_INVOKABLE  void addCourse(QString courseName);
+Q_INVOKABLE  void addTheme(QString themeName);
 
-Q_INVOKABLE  void deleteImage(qint64 semesterNumber, QString courseName, QString themeName, QString path);
-Q_INVOKABLE  void deleteCourse(qint64 semesterNumber, QString courseName);
-Q_INVOKABLE  void deleteSemester(qint64 semesterNumber);
-Q_INVOKABLE  void deleteTheme(qint64 semesterNumber, QString courseName, QString themeName);
+Q_INVOKABLE  void addTags(QString tags);
+Q_INVOKABLE  void setComment(QString comment);
 
-Q_INVOKABLE  void addTags(qint64 semesterNumber, QString courseName, QString themeName, QString path, QStringList tags);
-Q_INVOKABLE  void setComment(qint64 semesterNumber, QString courseName, QString themeName, QString path, QString comment);
-    signals:
+Q_INVOKABLE  QString showTags();
+Q_INVOKABLE  QString showComment();
+Q_INVOKABLE void print(QUrl data);
+
+Q_INVOKABLE QVariantList getChildrenIndexes();
+
+Q_INVOKABLE QVariantList findByTags (QString _tags);
+
+   signals:
 
     public slots:
 };
