@@ -141,7 +141,8 @@ void ImageProvider::fetchAll(const QModelIndex &parent) {
 
       childData->comments = query.value("comment").toString();
       childData->pid = query.value("pid").toInt();
-      childData->tags = query.value("tags").toStringList();
+      QString tagString = query.value("tags").toString();
+      childData->tags = tagString.split(",");
       childData->path = query.value("path").toString();
 
       childWrapper->row = count++;
@@ -458,6 +459,7 @@ void ImageProvider::setDataImage(const QModelIndex &parent, QString path, QStrin
     qDebug() << "setDataImage";
 
     DataWrapper* ptr = dataForIndex(parent);
+    QString tagString = tags.join(",");
 
     QSqlQuery queryForInsert;
     queryForInsert.prepare("INSERT INTO IMAGES (pid, number, path, comment, tags, type) VALUES (:pid, :number, :path, :comment, :tags, :type)" );
@@ -465,7 +467,7 @@ void ImageProvider::setDataImage(const QModelIndex &parent, QString path, QStrin
     queryForInsert.bindValue(":number", ptr->childrenCount);
     queryForInsert.bindValue(":path", path);
     queryForInsert.bindValue(":comment", comments);
-    queryForInsert.bindValue(":tags", tags);
+    queryForInsert.bindValue(":tags", tagString);
     queryForInsert.bindValue(":type", "image");
     queryForInsert.exec();
 
@@ -609,7 +611,14 @@ void ImageProvider::addTags(QString tags) {
     if (imagePtr->type != IMAGE)
         return;
 
-    imagePtr->data->tags = tags.split(',');
+    QStringList tagsList = tags.split(',');
+    imagePtr->data->tags.append(tagsList);
+
+    QSqlQuery query;
+    query.prepare("UPDATE IMAGES SET tags=:tags WHERE ID=:id");
+    query.bindValue(":id", imagePtr->id);
+    query.bindValue(":tags", imagePtr->data->tags.join(","));
+    query.exec();
 }
 
 void ImageProvider::setComment(QString comment) {
@@ -620,6 +629,12 @@ void ImageProvider::setComment(QString comment) {
         return;
 
     imagePtr->data->comments = comment;
+
+    QSqlQuery query;
+    query.prepare("UPDATE IMAGES SET comment=:comment WHERE ID=:id");
+    query.bindValue(":id", imagePtr->id);
+    query.bindValue(":tags", imagePtr->data->comments);
+    query.exec();
 }
 
 void ImageProvider::setCurrentIndex (const QModelIndex &currentIndex) {
@@ -803,15 +818,27 @@ QVariantList ImageProvider::findByTags (QString _tags) {
 
     for (qint64 i = 0; i < root.children.size(); ++i) {
         DataWrapper* fls = root.children[i];
+        QModelIndex flsIndex = index(fls->row,0,QModelIndex());
+        this->fetchMore(flsIndex);
 
         for (qint64 j = 0; j < fls->children.size(); ++j) {
             DataWrapper* sls = fls->children[j];
+            QModelIndex slsIndex = index(sls->row,0,flsIndex);
+            this->fetchMore(slsIndex);
 
             for (qint64 k = 0; k < sls->children.size(); ++k) {
                 DataWrapper* tls = sls->children[k];
+                QModelIndex tlsIndex = index(tls->row,0,slsIndex);
+                this->fetchMore(tlsIndex);
 
-                if (this->include(tls->data->tags, tags)) {
-                    result.push_back(tls->data->path);
+                for (qint64 l = 0; l < tls->children.size(); ++l) {
+                    DataWrapper* fthls = tls->children[l];
+                    QModelIndex fthlsIndex = index(fthls->row,0,tlsIndex);
+                    this->fetchMore(fthlsIndex);
+
+                    if (this->include(fthls->data->tags, tags)) {
+                        result.push_back(fthls->data->path);
+                    }
                 }
             }
         }
