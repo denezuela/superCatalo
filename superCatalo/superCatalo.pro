@@ -7,7 +7,8 @@ QT += qml quick sql widgets core gui printsupport
 CONFIG += c++11
 
 SOURCES += main.cpp \
-    imageprovider.cpp
+    imageprovider.cpp \
+    imageredactor.cpp
 
 RESOURCES += qml.qrc
 
@@ -20,4 +21,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    imageprovider.h
+    imageprovider.h \
+    imageredactor.h

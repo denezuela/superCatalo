@@ -112,13 +112,20 @@ TreeView {
                         if(mymodel.data(index_1,1))
                         {
                             image.source = mymodel.data(index_1,1);
+                            redactor.loadImage(mymodel.data(index_1,1));
+                            imagesource.text=image.source;
+                            botton_row.visible=true
                             image.visible=true;
+                            rotation_image.visible=true;
+                            redactor.saveImage("../Pictures/temp.jpg");
+                            mouseArea_under_image.rotation=0;
                             //slider_image.visible = true;slider_rotation.visible=true;
                             button_print.visible=true;
                             mymodel.setCurrentIndex(index_1);
                             textField_comment.visible=true;
                             //textField_comment.text="Комментарий: "+mymodel.showComment();
                             textField_comment.text="Тег: "+mymodel.showTags();
+
 
                         }
                     }
@@ -154,8 +161,9 @@ TreeView {
             }
         }
 
-    Image {
-        id: image
+
+    Item{
+        id: redactor_for_image
         visible: true
         anchors.left: treeView.right
         anchors.leftMargin: 10
@@ -164,17 +172,341 @@ TreeView {
         anchors.right:parent.right
         anchors.rightMargin: 24
         anchors.bottom: treeView.bottom
-        fillMode: Image.PreserveAspectFit //изображение масштабируется равномерно, чтобы соответствовать без кадрирования
-        smooth: true
 
-        //scale: slider_image.value //масштаб
-        //rotation: slider_rotation.value*360
-        MouseArea {
-            anchors.fill: parent
-            id: mouseArea_image
+        Item{
+            id: rect_for_image
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.right: parent.right
+            width: parent.width
+            height: parent.height*0.9
+
+            Image {
+                id: rotation_image
+                anchors.left: parent.left
+                visible: false
+                anchors.verticalCenter: parent.verticalCenter
+                width: 50
+                height: parent.height*0.8
+                source: "image/line.png"
+
+            }
+         MouseArea {
+             anchors.fill: parent
+             id: mouseArea_under_image
+             property int firstX: image.width/2
+             property int firstY: image.height/2
+             property int lastX: image.width/2
+             property int lastY: image.height/2
+             property int rotation: 0
+             onPressed: {
+                 if(canvas.visible===false)
+                 if(rotation_image.visible===true)
+                 {
+                        firstY=mouseY
+                 }
+             }
+             onPositionChanged: {
+                if(canvas.visible===false)
+                    if(rotation_image.visible===true)
+                {
+                    lastY=firstY;
+                    firstY=mouseY
+                    mouseArea_under_image.rotation-=(firstY-lastY)/mouseArea_under_image.height*360;
+                    redactor.loadImage("../Pictures/temp.jpg");
+                    redactor.rotate(rotation);
+                    redactor.saveImage("../Pictures/temp_rotation.jpg");
+                    image.source="file:"
+                    image.source="file:../Pictures/temp_rotation.jpg"
+
+                }
+             }
+
+            Image {
+                // Positioner: parent.Center
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                id: image
+                scale:Math.min(parent.height/height, parent.width/width)*0.8;
+                fillMode: Image.PreserveAspectFit
+                cache: false
+                MouseArea {
+                    anchors.fill: parent
+                    id: mouseArea_image
+                    onPressed: {
+                        if(canvas.visible===true){
+                        canvas.firstX = mouseX
+                        canvas.firstY = mouseY
+                        canvas.lastX=mouseX
+                        canvas.lastY=mouseY
+                        canvas.requestPaint()}
+                    }
+                    onPositionChanged: {
+                       if(canvas.visible===true){
+                       canvas.lastX = Math.max(0,Math.min(mouseX, canvas.width))
+                       canvas.lastY = Math.max(0,Math.min(mouseY, canvas.height))
+                       canvas.requestPaint()
+                       }
+                    }
+                }
+                Text{
+                 id: imagesource
+                 text: " "
+                 visible: false
+                }
+                Canvas{
+                    id:canvas
+                    visible: false
+                    height: image.height
+                    width: image.width
+                    property int firstX: 0
+                    property int firstY: 0
+                    property int lastX: canvas.width
+                    property int lastY: canvas.height
+                    onPaint:{
+                         var ctx = canvas.getContext('2d');
+                         ctx = getContext("2d")
+                         ctx.lineWidth = Math.max(2,height/200);
+                         ctx.strokeStyle=Qt.rgba(0.921, 0.478, 0.137, 1);
+                         ctx.clearRect(0,0,canvas.width,canvas.height)
+                         ctx.beginPath()
+                         ctx.rect(firstX,firstY,Math.min(lastX - firstX, image.width),Math.min(lastY - firstY,image.height))
+                         ctx.stroke()
+                     }
+                }
+
+                    }
+         }
         }
-    }
+       Item{
+           anchors.left: parent.left
+           anchors.bottom: parent.bottom
+           anchors.right: parent.right
+           width: parent.width
+           height: parent.height*0.1
+           Row{
+               id: botton_row
+               anchors.horizontalCenter: parent.horizontalCenter
+               anchors.verticalCenter: parent.verticalCenter
+               height: Math.min(parent.height*0.8, 50)
+                visible: false
+               spacing:10//min(10,(parent.width/2-5*parent.height*0.8)/4)
 
+
+               Button {
+                   height: parent.height*0.8
+                   width: height
+                   style:
+                    ButtonStyle {
+                       background: Rectangle {
+                                    color: "#4ea9cc"
+                                    border.color: "#3877a8"
+                                    radius: 4
+                                    Image {
+                                        anchors.fill: parent
+                                        source: "image/undo.png"
+                                    }
+                       }
+                    }
+                   onClicked:
+                   {
+                       image.source=imagesource.text
+                       redactor.loadImage(imagesource.text);
+                       redactor.saveImage("../Pictures/temp.jpg")
+                       canvas.firstX=0;
+                      canvas.firstY=0;
+                      canvas.lastY=image.height;
+                      canvas.lastX=image.width;
+                       if(canvas.visible===true){
+                           canvas.visible=false
+                       }
+                   }
+
+                   }
+
+
+               Button {
+                   id: left_rotate
+                   height: parent.height*0.8
+                   width: height
+                   style:
+                    ButtonStyle {
+                       background: Rectangle {
+                                    color: "#4ea9cc"
+                                    border.color: "#3877a8"
+                                    radius: 4
+                                    Image {
+                                        anchors.fill: parent
+                                        source: "image/left.png"
+                                    }
+                       }
+                    }
+                   onClicked:
+                   {
+                       redactor.rotate(270);
+                       redactor.saveImage("../Pictures/temp.jpg");
+                       image.source="file:"
+                       image.source="file:../Pictures/temp.jpg"
+                       canvas.firstX=0;
+                      canvas.firstY=0;
+                      canvas.lastY=image.height;
+                      canvas.lastX=image.width;
+                       if(canvas.visible===true){
+                           canvas.requestPaint()
+                       }
+                   }
+
+                   }
+               Button {
+                   height: parent.height*0.8
+                   width: height
+                   style:
+                       ButtonStyle {
+                      background: Rectangle {
+                                   color: "#4ea9cc"
+                                   border.color: "#3877a8"
+                                   radius: 4
+                                   Image {
+                                       anchors.fill: parent
+                                       source: "image/blackwhite.png"
+                                   }
+                      }
+                   }
+                   onClicked:
+                   {
+                        redactor.blackAndWhite();
+                        redactor.saveImage("../Pictures/temp.jpg");
+                        image.source="file:"
+                        image.source="file:../Pictures/temp.jpg"
+                   }
+                   }
+               Button {
+                   height: parent.height*0.8
+                   width: height
+                   style:
+                    ButtonStyle {
+                       background:
+                           Rectangle {
+                           function color()
+                           {
+                           return canvas.visible===false ? "#4ea9cc" : "#ec7c26";
+                           }
+                                    color: color()
+                                    border.color: "#3877a8"
+                                    radius: 4
+                                    Image {
+                                        anchors.fill: parent
+                                        source: "image/crop.png"
+                                    }
+                       }
+                    }
+                   onClicked: {
+                       if(canvas.visible===true){
+                       redactor.crop(canvas.firstX,canvas.firstY,Math.max(0,Math.min(canvas.lastX,image.width)) ,Math.max(0,Math.min(canvas.lastY,image.height)));
+                       redactor.saveImage("../Pictures/temp.jpg");
+                       image.source="file:"
+                       image.source="file:../Pictures/temp.jpg"
+                       canvas.visible=false
+                       canvas.lastX=image.width
+                       canvas.lastY=image.height
+                       canvas.firstX=0;
+                       canvas.firstY=0;
+
+                       }
+                       else {
+                           canvas.firstX=0;
+                          canvas.firstY=0;
+                          canvas.lastY=image.height;
+                          canvas.lastX=image.width;
+                           canvas.visible=true;
+                          canvas.requestPaint();
+                       }
+                   }
+                   }
+               Button {
+                   height: parent.height*0.8
+                   width: height
+                   style:
+                       ButtonStyle {
+                      background: Rectangle {
+                                   color: "#4ea9cc"
+                                   border.color: "#3877a8"
+                                   radius: 4
+                                   Image {
+                                       anchors.fill: parent
+                                       source: "image/gauss.png"
+                                   }
+                      }
+                   }
+                   onClicked:
+                   {
+                       redactor.blackAndWhite();
+                       redactor.blur(35);
+                       redactor.division();
+                       redactor.saveImage("../Pictures/temp.jpg");
+                       image.source="file:"
+                       image.source="file:../Pictures/temp.jpg"
+                   }
+                   }
+               Button {
+                   height: parent.height*0.8
+                   width: height
+                   style:
+                    ButtonStyle {
+                       background: Rectangle {
+                                    color: "#4ea9cc"
+                                    border.color: "#3877a8"
+                                    radius: 4
+                                    Image {
+                                        anchors.fill: parent
+                                        source: "image/right.png"
+                                    }
+                       }
+                    }
+                   onClicked:
+                   {
+                       redactor.rotate(90);
+                       redactor.saveImage("../Pictures/temp.jpg");
+                       image.source="file:"
+                       image.source="file:../Pictures/temp.jpg"
+                       canvas.firstX=0;
+                      canvas.firstY=0;
+                      canvas.lastY=image.height;
+                      canvas.lastX=image.width;
+                       if(canvas.visible===true){
+                           canvas.requestPaint()
+                       }
+                   }
+                   }
+
+               Button {
+                   height: parent.height*0.8
+                   width: height
+                   style:
+                    ButtonStyle {
+                       background: Rectangle {
+                                    color: "#4ea9cc"
+                                    border.color: "#3877a8"
+                                    radius: 4
+                                    Image {
+                                        anchors.fill: parent
+                                        source: "image/save.png"
+                                    }
+                       }
+                    }
+                   onClicked:
+                   {
+                       redactor.saveImage(imagesource.text);
+                       image.source=imagesource.text
+
+
+                   }
+                   }
+
+
+           }
+       }
+}
     Text{
            id: textField_comment
            anchors.left: button_print.right
@@ -186,31 +518,7 @@ TreeView {
            visible: false
     }
 
-//    Slider {
-//        id: slider_rotation
-//        anchors.left:treeView.right
-//        anchors.leftMargin: 10
-//        anchors.top: treeView.top
-//        width: 100
-//        height: 20
-//        stepSize: 0.001
-//        visible: false
-//        onEnabledChanged: {
-//            image.rotation = slider_rotation.value;
-//        }
-//    }
 
-//    Slider {
-//        id: slider_image
-//        anchors.left:treeView.right
-//        anchors.leftMargin: 10
-//        anchors.top: treeView.top
-//        width: 100
-//        height: 20
-//        value: 0.5
-//        maximumValue: 1
-//        visible: false
-//    }
 
 Button {
     id: button_print

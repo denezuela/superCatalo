@@ -7,6 +7,7 @@
 #include <QQmlComponent>
 #include <QItemSelectionModel>
 #include "imageprovider.h"
+#include "imageredactor.h"
 
 int main(int argc, char *argv[])
 {
@@ -16,9 +17,12 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
 
     ImageProvider ip;
-
+    ImageRedactor ir;
     engine.rootContext()->setContextProperty("mymodel", &ip);
+    engine.rootContext()->setContextProperty("redactor", &ir);
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
     return app.exec();
+
+
 }

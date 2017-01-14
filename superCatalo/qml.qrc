@@ -10,5 +10,13 @@
         <file>print.png</file>
         <file>search.png</file>
         <file>plus.png</file>
+        <file>crop.png</file>
+        <file>save.png</file>
+        <file>undo.png</file>
+        <file>blackwhite.png</file>
+        <file>gauss.png</file>
+        <file>line.png</file>
+        <file>left.png</file>
+        <file>right.png</file>
     </qresource>
 </RCC>
