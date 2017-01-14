@@ -837,7 +837,7 @@ QVariantList ImageProvider::findByTags (QString _tags) {
                     this->fetchMore(fthlsIndex);
 
                     if (this->include(fthls->data->tags, tags)) {
-                        result.push_back(fthls->data->path);
+                        result.push_back(QUrl::fromLocalFile(fthls->data->path));
                     }
                 }
             }
