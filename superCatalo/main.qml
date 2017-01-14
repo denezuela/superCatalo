@@ -61,7 +61,9 @@ ApplicationWindow {
 
                 MenuItem {
                     text: qsTr("&Удалить элемент")
-                    onTriggered: { mymodel.deleteItem(); image.visible=false}
+                    onTriggered: { mymodel.deleteItem();
+                                   image.visible=false;
+                                    textField_comment.visible=false;}
                 }
             }
     }
@@ -392,7 +394,8 @@ WindowAdd {
     function callbackOK(){
                         mymodel.setComment(textField_newcomment.text);
                         item_addcomment.visible=false;
-                        textField_newcomment.text=""; }
+                        textField_newcomment.text="";
+                        textField_comment.text="Комментарий: "+mymodel.showComment()}
     function callbackClose() { item_addcomment.visible=false }
 }
 
@@ -407,7 +410,7 @@ WindowAdd {
         placeholderText: qsTr("Введите тег")
        }
     function callbackOK(){
-                        mymodel.setComment(textField_newtag.text);
+                        mymodel.addTags(textField_newtag.text);
                         item_addtag.visible=false;
                         textField_newtag.text=""; }
     function callbackClose() { item_addtag.visible=false }
