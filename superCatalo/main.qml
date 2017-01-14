@@ -5,7 +5,7 @@ import QtQml.Models 2.2
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Layouts 1.3
 import QtQuick.Window 2.0
-import QtGraphicalEffects 1.0
+//import QtGraphicalEffects 1.0
 
 ApplicationWindow {
     id:window
@@ -62,8 +62,8 @@ ApplicationWindow {
                 MenuItem {
                     text: qsTr("&Удалить элемент")
                     onTriggered: { mymodel.deleteItem();
-                                   image.visible=false;
-                                    textField_comment.visible=false;}
+                                   image.visible=false
+                                   textField_comment.visible=false;}
                 }
             }
     }
@@ -117,7 +117,8 @@ TreeView {
                             button_print.visible=true;
                             mymodel.setCurrentIndex(index_1);
                             textField_comment.visible=true;
-                            textField_comment.text="Комментарий: "+mymodel.showComment();
+                            //textField_comment.text="Комментарий: "+mymodel.showComment();
+                            textField_comment.text="Тег: "+mymodel.showTags();
 
                         }
                     }
@@ -159,6 +160,7 @@ TreeView {
         anchors.left: treeView.right
         anchors.leftMargin: 10
         anchors.top: button_search.bottom
+        anchors.topMargin: 5
         anchors.right:parent.right
         anchors.rightMargin: 24
         anchors.bottom: treeView.bottom
@@ -175,8 +177,10 @@ TreeView {
 
     Text{
            id: textField_comment
-           x: 312
-           y: 8
+           anchors.left: button_print.right
+           anchors.leftMargin: 10
+           anchors.top: parent.top
+           anchors.topMargin: 2
            width: 250
            height: 20
            visible: false
@@ -395,7 +399,7 @@ WindowAdd {
                         mymodel.setComment(textField_newcomment.text);
                         item_addcomment.visible=false;
                         textField_newcomment.text="";
-                        textField_comment.text="Комментарий: "+mymodel.showComment()}
+                        textField_comment.text="Комментарий: "+mymodel.showComment() }
     function callbackClose() { item_addcomment.visible=false }
 }
 
@@ -412,7 +416,8 @@ WindowAdd {
     function callbackOK(){
                         mymodel.addTags(textField_newtag.text);
                         item_addtag.visible=false;
-                        textField_newtag.text=""; }
+                        textField_newtag.text="";
+    }
     function callbackClose() { item_addtag.visible=false }
 }
 
@@ -465,6 +470,7 @@ Button
 }
     onClicked:{item_addsemester.visible=true}
 }
+
 Rectangle{
     id:searchForm
     visible: false
@@ -486,6 +492,30 @@ Rectangle{
         }
     }
     Button {
+        id:button_ago
+        anchors.left: parent.left
+        anchors.leftMargin: 3
+        anchors.top: parent.top
+        anchors.topMargin: 5
+        width: 27
+        height: 27
+        style:
+         ButtonStyle {
+            background:
+                Rectangle {
+                         color: "#4ea9cc"
+                         border.color: "#3877a8"
+                         radius: 4
+                         Image {
+                             width: 27;height: 27
+                             source: "image/ago.png"
+                         }
+            }
+        }
+        onClicked:{searchForm.visible=false}
+    }
+
+    Button {
         id: button_search1
         anchors.left: textField_search.right
         anchors.leftMargin: 10
@@ -494,19 +524,41 @@ Rectangle{
         width: 92
         height: 27
         text: qsTr("Поиск")
+        style:
+         ButtonStyle {
+           background:
+               Rectangle {
+                        color: "#4ea9cc"
+                        border.color: "#3877a8"
+                        radius: 4
+           }
+       }
+        onClicked: { var imageList = mymodel.findByTags(textField_search.text)
+        image_sourse.source=imageList[1] }
+
     }
     TextField {
             id: textField_search
-            anchors.left: parent.left
+            anchors.left: button_ago.right
             anchors.leftMargin: 10
             anchors.top: parent.top
             anchors.topMargin: 5
-            width: parent.width - button_search1.width - 30
+            width: parent.width - button_ago.width - button_search1.width - 50
             height: 27
             placeholderText: qsTr("Введите теги для поиска")
         }
+
+Image{
+ id:image_sourse
+ anchors.top: textField_search.bottom
+ anchors.topMargin: 15
+ anchors.left: button_ago.right
+ anchors.leftMargin: 10
+ anchors.right: textField_search.right
 }
-}
+
+    }
+  }
 }
 
 
