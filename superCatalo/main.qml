@@ -843,6 +843,62 @@ Rectangle{
        }
         onClicked: {
             var imageList = mymodel.findByTags(textField_search.text);
+//            console.log(imageList.length);
+            var i = 0;
+            image_sourse.source=imageList[i];
+            button_left.iconName = i-1;
+            button_right.iconName = i+1;
+        }
+
+    }
+
+    Button {
+        id: button_left
+        anchors.left: parent.left
+        anchors.leftMargin: 10
+        anchors.top: parent.top
+        anchors.topMargin: 200
+        text: qsTr("<")
+        width: 27
+        height: 27
+        style:
+         ButtonStyle {
+           background:
+               Rectangle {
+                        color: "#4ea9cc"
+                        border.color: "#3877a8"
+                        radius: 4
+           }
+       }
+        onClicked: {
+            var imageList = mymodel.findByTags(textField_search.text);
+            console.log(imageList.length);
+            var i = 0;
+            image_sourse.source=imageList[i];
+        }
+
+    }
+
+    Button {
+        id: button_right
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.rightMargin: 10
+        anchors.topMargin: 210
+        width: 27
+        height: 27
+        text: qsTr(">")
+        style:
+         ButtonStyle {
+           background:
+               Rectangle {
+                        color: "#4ea9cc"
+                        border.color: "#3877a8"
+                        radius: 4
+           }
+       }
+        onClicked: {
+            var imageList = mymodel.findByTags(textField_search.text);
             console.log(imageList.length);
             var i = 0;
             image_sourse.source=imageList[i];
@@ -863,7 +919,7 @@ Rectangle{
 Image{
  id:image_sourse
  anchors.top: textField_search.bottom
- anchors.topMargin: 80
+ anchors.topMargin: 10
  anchors.left: button_ago.right
  anchors.leftMargin: 100
  anchors.right: textField_search.right
