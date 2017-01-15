@@ -593,6 +593,11 @@ void ImageProvider::deleteItem() {
 
     removeRows(ptr->row, 1, parent);
     removeDataFromDb(ptr->id);
+
+    if (ptr->type == SEMESTER && ptr->row==0) {
+        this->beginResetModel();
+        this->endResetModel();
+    }
 }
 
 void ImageProvider::removeDataFromDb(qint64 id) {
