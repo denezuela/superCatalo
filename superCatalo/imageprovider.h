@@ -42,6 +42,7 @@ class ImageProvider : public QAbstractItemModel
         QSqlDatabase db;
         DataWrapper root{0, ROOT, nullptr, 0, 0, nullptr, {}, 0};
         QModelIndex currentIndex;
+        QVariantList currentImages;
         bool containsSemesterAlready (QList<DataWrapper*> children, qint64 number);
         bool containsCourseAlready (QList<DataWrapper*> children, QString comments);
         bool containsPathAlready (QList<DataWrapper*> children, QString path);
@@ -94,7 +95,8 @@ Q_INVOKABLE void print(QUrl data);
 
 Q_INVOKABLE QVariantList getChildrenIndexes();
 
-Q_INVOKABLE QVariantList findByTags (QString _tags);
+Q_INVOKABLE void findByTags (QString _tags);
+Q_INVOKABLE QVariant fetchImage (qint64 number);
 
    signals:
 

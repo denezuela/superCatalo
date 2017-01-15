@@ -812,7 +812,7 @@ QVariantList ImageProvider::getChildrenIndexes() {
     return indexes;
 }
 
-QVariantList ImageProvider::findByTags (QString _tags) {
+void ImageProvider::findByTags (QString _tags) {
     QStringList tags = _tags.split(',');
 
     QVariantList result;
@@ -845,7 +845,7 @@ QVariantList ImageProvider::findByTags (QString _tags) {
         }
     }
 
-    return result;
+   this->currentImages = result;
 }
 
 bool ImageProvider::include(const QStringList &big, const QStringList &small) {
@@ -855,4 +855,8 @@ bool ImageProvider::include(const QStringList &big, const QStringList &small) {
     }
 
     return false;
+}
+
+QVariant ImageProvider::fetchImage (qint64 number) {
+    return this->currentImages[number];
 }

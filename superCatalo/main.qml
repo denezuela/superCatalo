@@ -842,10 +842,10 @@ Rectangle{
            }
        }
         onClicked: {
-            var imageList = mymodel.findByTags(textField_search.text);
+            mymodel.findByTags(textField_search.text);
 //            console.log(imageList.length);
             var i = 0;
-            image_sourse.source=imageList[i];
+            image_sourse.source=mymodel.fetchImage(i);
             button_left.iconName = i-1;
             button_right.iconName = i+1;
         }
