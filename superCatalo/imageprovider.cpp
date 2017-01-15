@@ -634,7 +634,7 @@ void ImageProvider::setComment(QString comment) {
     QSqlQuery query;
     query.prepare("UPDATE IMAGES SET comment=:comment WHERE ID=:id");
     query.bindValue(":id", imagePtr->id);
-    query.bindValue(":tags", imagePtr->data->comments);
+    query.bindValue(":comment", imagePtr->data->comments);
     query.exec();
 }
 
@@ -812,7 +812,7 @@ QVariantList ImageProvider::getChildrenIndexes() {
     return indexes;
 }
 
-void ImageProvider::findByTags (QString _tags) {
+qint64 ImageProvider::findByTags (QString _tags) {
     QStringList tags = _tags.split(',');
 
     QVariantList result;
@@ -838,7 +838,7 @@ void ImageProvider::findByTags (QString _tags) {
                     this->fetchMore(fthlsIndex);
 
                     if (this->include(fthls->data->tags, tags)) {
-                        result.push_back(QUrl::fromLocalFile(fthls->data->path));
+                        result.push_back(fthls->data->path + "+" + fthls->data->comments);
                     }
                 }
             }
@@ -846,6 +846,7 @@ void ImageProvider::findByTags (QString _tags) {
     }
 
    this->currentImages = result;
+   return this->currentImages.size();
 }
 
 bool ImageProvider::include(const QStringList &big, const QStringList &small) {

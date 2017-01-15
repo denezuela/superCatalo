@@ -9,7 +9,6 @@
 #include <QStringList>
 #include <QModelIndex>
 #include <QUrl>
-
 #include <QVariant>
 
 
@@ -95,7 +94,7 @@ Q_INVOKABLE void print(QUrl data);
 
 Q_INVOKABLE QVariantList getChildrenIndexes();
 
-Q_INVOKABLE void findByTags (QString _tags);
+Q_INVOKABLE qint64 findByTags (QString _tags);
 Q_INVOKABLE QVariant fetchImage (qint64 number);
 
    signals:

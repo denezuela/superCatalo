@@ -783,6 +783,9 @@ Rectangle{
     id:searchForm
     visible: false
     anchors.fill: parent
+    property int max: 0
+    property int i: 0
+
     gradient: Gradient {
         GradientStop {
             position: 0.02
@@ -842,12 +845,13 @@ Rectangle{
            }
        }
         onClicked: {
-            mymodel.findByTags(textField_search.text);
-//            console.log(imageList.length);
-            var i = 0;
-            image_sourse.source=mymodel.fetchImage(i);
-            button_left.iconName = i-1;
-            button_right.iconName = i+1;
+
+            searchForm.max = mymodel.findByTags(textField_search.text)
+            var str=mymodel.fetchImage(0);
+            var str1="file:"
+            console.log(str.slice(0, str.indexOf('+')));
+            image_sourse.source=str1+str.slice(0, str.indexOf('+'));
+            text_comment.text=str.slice(str.indexOf('+')+1)
         }
 
     }
@@ -871,10 +875,12 @@ Rectangle{
            }
        }
         onClicked: {
-            var imageList = mymodel.findByTags(textField_search.text);
-            console.log(imageList.length);
-            var i = 0;
-            image_sourse.source=imageList[i];
+            searchForm.i=(searchForm.i-1+searchForm.max)%searchForm.max;
+            var str=mymodel.fetchImage(searchForm.i);
+            var str1="file:"
+            console.log(str.slice(0, str.indexOf('+')));
+            image_sourse.source=str1+str.slice(0, str.indexOf('+'));
+            text_comment.text=str.slice(str.indexOf('+')+1)
         }
 
     }
@@ -898,10 +904,13 @@ Rectangle{
            }
        }
         onClicked: {
-            var imageList = mymodel.findByTags(textField_search.text);
-            console.log(imageList.length);
-            var i = 0;
-            image_sourse.source=imageList[i];
+            searchForm.i=(searchForm.i+1)%searchForm.max;
+            var str=mymodel.fetchImage(searchForm.i);
+            var str1="file:"
+            console.log(str.slice(0, str.indexOf('+')));
+            image_sourse.source=str1+str.slice(0, str.indexOf('+'));
+            text_comment.text=str.slice(str.indexOf('+')+1, str.length)
+
         }
 
     }
@@ -916,6 +925,15 @@ Rectangle{
             placeholderText: qsTr("Введите теги для поиска")
         }
 
+    Text{
+           id: text_comment
+
+           anchors.top: textField_search.bottom
+           anchors.topMargin: 2
+           width: 250
+           height: 20
+
+    }
 Image{
  id:image_sourse
  anchors.top: textField_search.bottom
@@ -923,6 +941,8 @@ Image{
  anchors.left: button_ago.right
  anchors.leftMargin: 100
  anchors.right: textField_search.right
+ scale:Math.min(parent.height/height, parent.width/width)*0.8;
+ fillMode: Image.PreserveAspectFit
 }
 
     }

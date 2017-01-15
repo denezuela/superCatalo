@@ -83,7 +83,7 @@ void ImageRedactor::blur(int radius)
         r=0; g=0; b=0; sumRed=0;sumGreen=0; sumBlue=0; sumRed2=0; sumGreen2=0; sumBlue2=0; r1=g1=b1=0;
         for(int k=0;k<=radius;k++)
         {
-            rgb=image.pixelColor(radius+k,i);
+            rgb=image.pixelColor((m+k)%m,i);
             if(k>0){
             r+=rgb.red()*(1+radius-k);
             g+=rgb.green()*(1+radius-k);
@@ -92,7 +92,7 @@ void ImageRedactor::blur(int radius)
                 sumBlue2+=rgb.blue();
                 sumGreen2+=rgb.green();
             }
-            rgb=image.pixelColor(radius-k,i);
+            rgb=image.pixelColor((m-k)%m,i);
             r+=rgb.red()*(1+radius-k);
             g+=rgb.green()*(1+radius-k);
             b+=rgb.blue()*(1+radius-k);
@@ -107,19 +107,19 @@ void ImageRedactor::blur(int radius)
             rgb.setRed(qMin(r1,255.0));
             rgb.setGreen(qMin(g1,255.0));
             rgb.setBlue(qMin(b1,255.0));
-            blurimage.setPixelColor(radius,i,rgb);
+            blurimage.setPixelColor(0,i,rgb);
 
 
-        for(int j=radius+1; j<m-radius-1; j++)
+        for(int j=1; j<m; j++)
         {
             r-=sumRed;
             g-=sumGreen;
             b-=sumBlue;
-            rgb=image.pixelColor(j-radius-1,i);
+            rgb=image.pixelColor((m+j-radius-1)%m,i);
             sumRed-=rgb.red();
             sumGreen-=rgb.green();
             sumBlue-=rgb.blue();
-            rgb=image.pixelColor(j+radius,i);
+            rgb=image.pixelColor((j+radius)%m,i);
             sumRed2+=rgb.red();
             sumGreen2+=rgb.green();
             sumBlue2+=rgb.blue();
