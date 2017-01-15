@@ -472,12 +472,11 @@ void ImageProvider::setDataImage(const QModelIndex &parent, QString path, QStrin
     queryForInsert.exec();
 
     QSqlQuery queryForSelect;
-    queryForSelect.prepare("SELECT id FROM IMAGES WHERE pid=:pid and number=:number and path=:path and comment=:comment and tags=:tags and type=:type");
+    queryForSelect.prepare("SELECT id FROM IMAGES WHERE pid=:pid and number=:number and path=:path and comment=:comment and type=:type");
     queryForSelect.bindValue(":pid", ptr->id);
     queryForSelect.bindValue(":number", ptr->childrenCount);
     queryForSelect.bindValue(":path",path);
     queryForSelect.bindValue(":comment", comments);
-    queryForSelect.bindValue(":tags", tags);
     queryForSelect.bindValue(":type", "image");
     queryForSelect.exec();
     queryForSelect.next();
@@ -657,6 +656,7 @@ QString ImageProvider::showTags() {
     if (imagePtr->type != IMAGE)
         return "NO_TAGS";
 
+    QString result = imagePtr->data->tags.join(",");
     return imagePtr->data->tags.join(",");
 }
 

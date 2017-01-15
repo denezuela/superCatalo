@@ -126,9 +126,10 @@ TreeView {
                             textField_comment.visible=true;
                             textField_comment.text="Комментарий: "+mymodel.showComment();
                             textField_tag.visible=true;
-                            textField_tag.text="Тег: "+mymodel.showTags();
-
-
+                            var str = mymodel.showTags();
+                            if (str[0] === ',')
+                                str = str.slice(1);
+                            textField_tag.text="Тег: "+str;
                         }
                     }
                     if (mouse.button === Qt.RightButton)
@@ -736,6 +737,10 @@ WindowAdd {
                         mymodel.addTags(textField_newtag.text);
                         item_addtag.visible=false;
                         textField_newtag.text="";
+                        var str = mymodel.showTags();
+                        if (str[0] === ',')
+                            str = str.slice(1);
+                        textField_tag.text="Тег: "+str;
     }
     function callbackClose() { item_addtag.visible=false }
 }
