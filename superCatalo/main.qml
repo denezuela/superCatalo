@@ -123,8 +123,9 @@ TreeView {
                             button_print.visible=true;
                             mymodel.setCurrentIndex(index_1);
                             textField_comment.visible=true;
-                            //textField_comment.text="Комментарий: "+mymodel.showComment();
-                            textField_comment.text="Тег: "+mymodel.showTags();
+                            textField_comment.text="Комментарий: "+mymodel.showComment();
+                            textField_tag.visible=true;
+                            textField_tag.text="Тег: "+mymodel.showTags();
 
 
                         }
@@ -513,12 +514,19 @@ TreeView {
            anchors.leftMargin: 10
            anchors.top: parent.top
            anchors.topMargin: 2
-           width: 250
+           width: 150
+           height: 20
+           visible: false
+    }    
+    Text{
+           id: textField_tag
+           anchors.top: textField_comment.bottom
+           anchors.topMargin: 2
+           anchors.left: textField_comment.left
+           width: 150
            height: 20
            visible: false
     }
-
-
 
 Button {
     id: button_print
@@ -736,8 +744,8 @@ Button
     anchors.leftMargin: 10
     anchors.top: parent.top
     anchors.topMargin: 2
-    width: 24
-    height: 24
+    width: 27
+    height: 27
     style:
      ButtonStyle {
         background:
@@ -746,7 +754,7 @@ Button
                      border.color: "#3877a8"
                      radius: 4
                      Image {
-                         width: 24;height: 24
+                         width: 27;height: 27
                          source: "image/search.png"
                      }
         }
@@ -761,8 +769,8 @@ Button
     anchors.leftMargin: 10
     anchors.top: parent.top
     anchors.topMargin: 2
-    width: 24
-    height: 24
+    width: 27
+    height: 27
     style:
      ButtonStyle {
         background:
@@ -771,7 +779,7 @@ Button
                      border.color: "#3877a8"
                      radius: 4
                      Image {
-                         width: 24;height: 24
+                         width: 27;height: 27
                          source: "image/plus.png"
                      }
         }
@@ -791,12 +799,10 @@ Rectangle{
             position: 0.02
             color: "#ffffff"
         }
-
         GradientStop {
             position: 0.5
             color: "#2bb2eb"
         }
-
         GradientStop {
             position: 0.949
             color: "#1b4251"
@@ -805,7 +811,7 @@ Rectangle{
     Button {
         id:button_ago
         anchors.left: parent.left
-        anchors.leftMargin: 3
+        anchors.leftMargin: 5
         anchors.top: parent.top
         anchors.topMargin: 5
         width: 27
@@ -823,7 +829,7 @@ Rectangle{
                          }
             }
         }
-        onClicked:{searchForm.visible=false}
+        onClicked:{searchForm.visible=false; textField_search.text="";}
     }
 
     Button {
@@ -845,13 +851,14 @@ Rectangle{
            }
        }
         onClicked: {
-
             searchForm.max = mymodel.findByTags(textField_search.text)
             var str=mymodel.fetchImage(0);
             var str1="file:"
             console.log(str.slice(0, str.indexOf('+')));
             image_sourse.source=str1+str.slice(0, str.indexOf('+'));
-            text_comment.text=str.slice(str.indexOf('+')+1)
+            text_comment.text="Комментарий: "+str.slice(str.indexOf('+')+1)
+            button_left.visible=true;
+            button_right.visible=true;
         }
 
     }
@@ -859,28 +866,29 @@ Rectangle{
     Button {
         id: button_left
         anchors.left: parent.left
-        anchors.leftMargin: 10
+        anchors.leftMargin: 30
         anchors.top: parent.top
         anchors.topMargin: 200
+        visible: false
         text: qsTr("<")
         width: 27
         height: 27
         style:
-         ButtonStyle {
-           background:
-               Rectangle {
-                        color: "#4ea9cc"
-                        border.color: "#3877a8"
-                        radius: 4
-           }
-       }
+            ButtonStyle {
+              background:
+                  Rectangle {
+                           color: "#4ea9cc"
+                           border.color: "#3877a8"
+                           radius: 4
+              }
+          }
         onClicked: {
             searchForm.i=(searchForm.i-1+searchForm.max)%searchForm.max;
             var str=mymodel.fetchImage(searchForm.i);
             var str1="file:"
             console.log(str.slice(0, str.indexOf('+')));
             image_sourse.source=str1+str.slice(0, str.indexOf('+'));
-            text_comment.text=str.slice(str.indexOf('+')+1)
+            text_comment.text="Комментарий: " + str.slice(str.indexOf('+')+1)
         }
 
     }
@@ -888,28 +896,29 @@ Rectangle{
     Button {
         id: button_right
         anchors.right: parent.right
+        anchors.rightMargin: 30
         anchors.top: parent.top
-        anchors.rightMargin: 10
-        anchors.topMargin: 210
+        anchors.topMargin: 200
+        visible: false
         width: 27
         height: 27
         text: qsTr(">")
         style:
-         ButtonStyle {
-           background:
-               Rectangle {
-                        color: "#4ea9cc"
-                        border.color: "#3877a8"
-                        radius: 4
-           }
-       }
+            ButtonStyle {
+              background:
+                  Rectangle {
+                           color: "#4ea9cc"
+                           border.color: "#3877a8"
+                           radius: 4
+              }
+          }
         onClicked: {
             searchForm.i=(searchForm.i+1)%searchForm.max;
             var str=mymodel.fetchImage(searchForm.i);
             var str1="file:"
             console.log(str.slice(0, str.indexOf('+')));
             image_sourse.source=str1+str.slice(0, str.indexOf('+'));
-            text_comment.text=str.slice(str.indexOf('+')+1, str.length)
+            text_comment.text="Комментарий: " + str.slice(str.indexOf('+')+1, str.length)
 
         }
 
@@ -927,21 +936,25 @@ Rectangle{
 
     Text{
            id: text_comment
-
+           x: 618
            anchors.top: textField_search.bottom
-           anchors.topMargin: 2
-           width: 250
+           anchors.topMargin: 3
+           width: 20
            height: 20
-
+           anchors.left: textField_search.left
     }
 Image{
+
  id:image_sourse
+ width:parent.width - button_ago.width - button_search1.width - 50
+ height: parent.height -button_ago.height - button_search1.height - 20
  anchors.top: textField_search.bottom
  anchors.topMargin: 10
- anchors.left: button_ago.right
- anchors.leftMargin: 100
- anchors.right: textField_search.right
- scale:Math.min(parent.height/height, parent.width/width)*0.8;
+ anchors.left: button_left.right
+ anchors.leftMargin: 80
+ anchors.right: button_right.left
+ anchors.rightMargin: 80
+ scale:Math.min(parent.height/height, parent.width/width)*0.8; //масштаб
  fillMode: Image.PreserveAspectFit
 }
 

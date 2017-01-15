@@ -18,5 +18,6 @@
         <file>line.png</file>
         <file>left.png</file>
         <file>right.png</file>
+        <file>ago.png</file>
     </qresource>
 </RCC>

@@ -3,15 +3,15 @@ import QtQuick 2.5
 Rectangle
 {
   id: button
-  width: 24
-  height: 24
+  width: 25
+  height: 25
   color: "#4ea9cc"
   border.color: "#3877a8"
   radius: 10
 
   Image {
-      width: 24;
-      height: 24;
+      width: 25;
+      height: 25;
       source: "image/close.png"
   }
   MouseArea
