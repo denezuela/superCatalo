@@ -841,8 +841,12 @@ Rectangle{
                         radius: 4
            }
        }
-        onClicked: { var imageList = mymodel.findByTags(textField_search.text)
-        image_sourse.source=imageList[1] }
+        onClicked: {
+            var imageList = mymodel.findByTags(textField_search.text);
+            console.log(imageList.length);
+            var i = 0;
+            image_sourse.source=imageList[i];
+        }
 
     }
     TextField {
@@ -859,9 +863,9 @@ Rectangle{
 Image{
  id:image_sourse
  anchors.top: textField_search.bottom
- anchors.topMargin: 15
+ anchors.topMargin: 80
  anchors.left: button_ago.right
- anchors.leftMargin: 10
+ anchors.leftMargin: 100
  anchors.right: textField_search.right
 }
 

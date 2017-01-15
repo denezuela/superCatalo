@@ -613,6 +613,7 @@ void ImageProvider::addTags(QString tags) {
 
     QStringList tagsList = tags.split(',');
     imagePtr->data->tags.append(tagsList);
+    tags = imagePtr->data->tags.join(',');
 
     QSqlQuery query;
     query.prepare("UPDATE IMAGES SET tags=:tags WHERE ID=:id");
