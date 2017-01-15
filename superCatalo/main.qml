@@ -63,7 +63,8 @@ ApplicationWindow {
                     text: qsTr("&Удалить элемент")
                     onTriggered: { mymodel.deleteItem();
                                    image.visible=false
-                                   textField_comment.visible=false;}
+                                   textField_comment.visible=false;
+                    textField_tag.visible=false}
                 }
             }
     }
@@ -169,7 +170,7 @@ TreeView {
         anchors.left: treeView.right
         anchors.leftMargin: 10
         anchors.top: button_search.bottom
-        anchors.topMargin: 5
+        anchors.topMargin: 0
         anchors.right:parent.right
         anchors.rightMargin: 24
         anchors.bottom: treeView.bottom
@@ -180,14 +181,14 @@ TreeView {
             anchors.top: parent.top
             anchors.right: parent.right
             width: parent.width
-            height: parent.height*0.9
+            height: parent.height*0.95
 
             Image {
                 id: rotation_image
                 anchors.left: parent.left
                 visible: false
                 anchors.verticalCenter: parent.verticalCenter
-                width: 50
+                width: 25
                 height: parent.height*0.8
                 source: "image/line.png"
 
@@ -227,8 +228,9 @@ TreeView {
                 // Positioner: parent.Center
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
+                anchors.leftMargin: 50
                 id: image
-                scale:Math.min(parent.height/height, parent.width/width)*0.8;
+                scale:Math.min(parent.height/height, parent.width/width)*0.95;
                 fillMode: Image.PreserveAspectFit
                 cache: false
                 MouseArea {
@@ -277,6 +279,7 @@ TreeView {
                 }
 
                     }
+
          }
         }
        Item{
@@ -284,7 +287,7 @@ TreeView {
            anchors.bottom: parent.bottom
            anchors.right: parent.right
            width: parent.width
-           height: parent.height*0.1
+           height: parent.height*0.05
            Row{
                id: botton_row
                anchors.horizontalCenter: parent.horizontalCenter
@@ -517,7 +520,7 @@ TreeView {
            width: 150
            height: 20
            visible: false
-    }    
+    }
     Text{
            id: textField_tag
            anchors.top: textField_comment.bottom
@@ -829,7 +832,11 @@ Rectangle{
                          }
             }
         }
-        onClicked:{searchForm.visible=false; textField_search.text="";}
+        onClicked:{searchForm.visible=false; textField_search.text="";
+            textField_search.text="";
+            image_sourse.source="file:"
+            text_comment.text="";
+            searchForm.max=0;}
     }
 
     Button {
@@ -867,8 +874,8 @@ Rectangle{
         id: button_left
         anchors.left: parent.left
         anchors.leftMargin: 30
-        anchors.top: parent.top
-        anchors.topMargin: 200
+        anchors.top: parent.verticalCenter
+       //anchors.topMargin: 200
         visible: false
         text: qsTr("<")
         width: 27
@@ -897,8 +904,8 @@ Rectangle{
         id: button_right
         anchors.right: parent.right
         anchors.rightMargin: 30
-        anchors.top: parent.top
-        anchors.topMargin: 200
+        anchors.top: parent.verticalCenter//parent.top
+        //anchors.topMargin: 200
         visible: false
         width: 27
         height: 27
@@ -936,12 +943,14 @@ Rectangle{
 
     Text{
            id: text_comment
-           x: 618
+          // x: 618
            anchors.top: textField_search.bottom
+           anchors.bottom: parent.bottom
            anchors.topMargin: 3
            width: 20
            height: 20
            anchors.left: textField_search.left
+          // anchors.left: parent.horizontalCenter
     }
 Image{
 
@@ -961,5 +970,3 @@ Image{
     }
   }
 }
-
-
