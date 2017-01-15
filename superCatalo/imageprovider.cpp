@@ -858,5 +858,7 @@ bool ImageProvider::include(const QStringList &big, const QStringList &small) {
 }
 
 QVariant ImageProvider::fetchImage (qint64 number) {
+    if (number < 0 || number >= this->currentImages.size())
+        return QVariant();
     return this->currentImages[number];
 }
