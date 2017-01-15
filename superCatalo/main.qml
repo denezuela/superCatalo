@@ -10,8 +10,8 @@ import QtQuick.Window 2.0
 ApplicationWindow {
     id:window
     visible: true
-    width: 700
-    height: 550
+    width: 800
+    height: 600
     title: qsTr("Super Catalo")
 
     menuBar: MenuBar {
@@ -24,145 +24,132 @@ ApplicationWindow {
                   border.width: 0.5
               }
         }
+
     Menu {
-                id: menu_a
+                id: menu
                 visible: false
-                title: qsTr("Добавить")
                 MenuItem {
                     id:addSemester
-                    text: qsTr("&Добавить семестр")
+                    text: qsTr("&Добавить семестр...")
                     onTriggered: item_addsemester.visible=true
                 }
                 MenuItem {
                     id:addCourse
-                    text: qsTr("&Добавить предмет")
+                    text: qsTr("&Добавить предмет...")
                     onTriggered: item_addcourse.visible=true
                 }
                 MenuItem {
                     id:addTheme
-                    text: qsTr("&Добавить тему")
+                    text: qsTr("&Добавить тему...")
                     onTriggered: item_addtheme.visible=true
                 }
                 MenuItem {
                     id: addImage
-                    text: qsTr("&Добавить изображение")
+                    text: qsTr("&Добавить изображение...")
                     onTriggered: item_addimage.visible=true
                 }
                 MenuItem {
                     id: addComment
-                    text: qsTr("&Добавить комментарий")
+                    text: qsTr("&Изменить комментарий...")
                     onTriggered: item_addcomment.visible=true
                 }
                 MenuItem {
                     id: addTag
-                    text: qsTr("&Добавить тег")
+                    text: qsTr("&Добавить тег...")
                     onTriggered: item_addtag.visible=true
                 }
 
                 MenuItem {
-                    text: qsTr("&Удалить элемент")
-                    onTriggered: { mymodel.deleteItem();
+                    text: qsTr("&Удалить...")
+                    onTriggered: { ip.deleteItem();
                                    image.visible=false
                                    textField_comment.visible=false;
-                    textField_tag.visible=false}
+                                    textField_tag.visible=false}
                 }
             }
     }
+
     StartForm {
         id: imageForm
         anchors.fill: parent
-TreeView {
-        id: treeView
-        x: 3
-        y: 2
-        width: parent.width/3.8 //ширина
-        height: parent.height/1.05+7 // высота
-        model: mymodel
-        backgroundVisible: true
-        frameVisible: true
-        style: TreeViewStyle {
-          alternateBackgroundColor: "#398eb1" //цвет полосок
-          backgroundColor: "#398eb1" //цвет фона
-        }
-        TableViewColumn{
-                    title:"Структура"
-                    role: "display"
-                    width:500 //появляется прокрутка
-        }
-            MouseArea {
-                id: mouseArea_tree
-                anchors.topMargin: 0
-                anchors.bottomMargin: 30 //нижнее поле
-                anchors.fill: parent
-                acceptedButtons: Qt.RightButton | Qt.LeftButton
-                onClicked:
-                {
-                    if (mouse.button === Qt.LeftButton)
-                    {
-                        var index_1 = parent.indexAt(mouse.x, mouse.y)
-                        if (index_1.valid)
-                        { if (parent.isExpanded(index_1)) {
-                                mymodel.setCurrentIndex(index_1);
-                                var indexes = mymodel.getChildrenIndexes();
-                                for (var i = indexes.length - 1; i >= 0; --i)
-                                    parent.collapse(indexes[i]);
-                            }
-                            else parent.expand(index_1)
-                        }
-
-                        if(mymodel.data(index_1,1))
+        TreeView {
+                id: treeView
+                x: 3
+                y: 2
+                width: parent.width/3.8 //ширина
+                height: parent.height/1.05+7 // высота
+                model: ip
+                backgroundVisible: true
+                frameVisible: true
+                style: TreeViewStyle {
+                  alternateBackgroundColor: "#398eb1" //цвет полосок
+                  backgroundColor: "#398eb1" //цвет фона
+                }
+                TableViewColumn{
+                            title:"Структура"
+                            role: "display"
+                            width:500 //появляется прокрутка
+                }
+                    MouseArea {
+                        id: mouseArea_tree
+                        anchors.topMargin: 0
+                        anchors.bottomMargin: 30 //нижнее поле
+                        anchors.fill: parent
+                        acceptedButtons: Qt.RightButton | Qt.LeftButton
+                        onClicked:
                         {
-                            image.source = mymodel.data(index_1,1);
-                            redactor.loadImage(mymodel.data(index_1,1));
-                            imagesource.text=image.source;
-                            botton_row.visible=true
-                            image.visible=true;
-                            rotation_image.visible=true;
-                            redactor.saveImage("../Pictures/temp.jpg");
-                            mouseArea_under_image.rotation=0;
-                            //slider_image.visible = true;slider_rotation.visible=true;
-                            button_print.visible=true;
-                            mymodel.setCurrentIndex(index_1);
-                            textField_comment.visible=true;
-                            textField_comment.text="Комментарий: "+mymodel.showComment();
-                            textField_tag.visible=true;
-                            var str = mymodel.showTags();
-                            if (str[0] === ',')
-                                str = str.slice(1);
-                            textField_tag.text="Тег: "+str;
+                            if (mouse.button === Qt.LeftButton)
+                            {
+                                var leftButtonIndex = parent.indexAt(mouse.x, mouse.y)
+                                if (leftButtonIndex.valid)
+                                { if (parent.isExpanded(leftButtonIndex)) {
+                                        ip.setCurrentIndex(leftButtonIndex);
+                                        var indexes = ip.getChildrenIndexes();
+                                        for (var i = indexes.length - 1; i >= 0; --i)
+                                            parent.collapse(indexes[i]);
+                                    }
+                                    else parent.expand(leftButtonIndex)
+                                }
+
+                                if(ip.data(leftButtonIndex,1))
+                                {
+                                    image.source = ip.data(leftButtonIndex,1);
+                                    redactor.loadImage(ip.data(leftButtonIndex,1));
+                                    imagesource.text=image.source;
+                                    botton_row.visible=true
+                                    image.visible=true;
+                                    rotation_image.visible=true;
+                                    redactor.saveImage("../Pictures/temp.jpg");
+                                    mouseArea_under_image.rotation=0;
+                                    //slider_image.visible = true;slider_rotation.visible=true;
+                                    button_print.visible=true;
+                                    ip.setCurrentIndex(leftButtonIndex);
+                                    textField_comment.visible=true;
+                                    textField_comment.text="Комментарий: "+ip.showComment();
+                                    textField_tag.visible=true;
+                                    var str = ip.showTags();
+                                    if (str[0] === ',')
+                                        str = str.slice(1);
+                                    textField_tag.text="Тег: "+str;
+                                }
+                            }
+                            if (mouse.button === Qt.RightButton)
+                            {
+                                var rightButtonIndex = parent.indexAt(mouse.x, mouse.y)
+                                if (rightButtonIndex.valid) {
+                                    addSemester.visible = ip.showMenuItem(rightButtonIndex,1)
+                                    addCourse.visible = ip.showMenuItem(rightButtonIndex,1)
+                                    addTheme.visible = ip.showMenuItem(rightButtonIndex,2)
+                                    addImage.visible = ip.showMenuItem(rightButtonIndex,3)
+                                    addComment.visible = ip.showMenuItem(rightButtonIndex,4)
+                                    addTag.visible = ip.showMenuItem(rightButtonIndex,4)
+                                    ip.setCurrentIndex(rightButtonIndex)
+                                    menu.popup()
+                                }
+                            }
                         }
                     }
-                    if (mouse.button === Qt.RightButton)
-                    {
-                        var index_2 = parent.indexAt(mouse.x, mouse.y)
-                        if (index_2.valid) {
-                            addSemester.visible = mymodel.showMenuItem(index_2,1)
-                            addCourse.visible = mymodel.showMenuItem(index_2,1)
-                            addTheme.visible = mymodel.showMenuItem(index_2,2)
-                            addImage.visible = mymodel.showMenuItem(index_2,3)
-                            addComment.visible = mymodel.showMenuItem(index_2,4)
-                            addTag.visible = mymodel.showMenuItem(index_2,4)
-                            mymodel.setCurrentIndex(index_2)
-                            menu_a.popup()
-                        }
                 }
-                }
-//                onDoubleClicked:
-//                {
-//                    var index_image = parent.indexAt(mouse.x, mouse.y);
-//                    if(mymodel.data(index_image,1))
-//                    {
-//                        image.source = mymodel.data(index_image,1);
-//                        //slider_image.visible = true;slider_rotation.visible=true;
-//                        button_print.visible=true;
-//                        mymodel.setCurrentIndex(index_image);
-//                        textField_comment.visible=true;
-//                        textField_comment.text="Комментарий: "+mymodel.showComment();
-
-//                    }
-//                }
-            }
-        }
 
 
     Item{
@@ -552,7 +539,7 @@ Button {
                      }
         }
                         }
-    onClicked:mymodel.print(image.source)
+    onClicked:ip.print(image.source)
     visible: false
 }
 
@@ -567,7 +554,7 @@ WindowAdd {
         placeholderText: qsTr("Введите номер семестра")
        }
     function callbackOK(){
-                        mymodel.addSemester(textField_numsemester.text);
+                        ip.addSemester(textField_numsemester.text);
                         item_addsemester.visible=false;
                         textField_numsemester.text=""; }
     function callbackClose() { item_addsemester.visible=false }
@@ -584,7 +571,7 @@ WindowAdd {
         placeholderText: qsTr("Введите название предмета")
        }
     function callbackOK(){
-                        mymodel.addCourse(textField_namecourse.text);
+                        ip.addCourse(textField_namecourse.text);
                         item_addcourse.visible=false;
                         textField_namecourse.text=""; }
     function callbackClose() { item_addcourse.visible=false }
@@ -601,7 +588,7 @@ WindowAdd {
         placeholderText: qsTr("Введите название темы")
        }
     function callbackOK(){
-                        mymodel.addTheme(textField_nametheme.text);
+                        ip.addTheme(textField_nametheme.text);
                         item_addtheme.visible=false;
                         textField_nametheme.text=""; }
     function callbackClose() { item_addtheme.visible=false }
@@ -695,7 +682,7 @@ WindowAdd {
               }
           }
           onClicked: {
-              mymodel.addImage(textField_path.text,textField_imagecomment.text,textField_imagetads.text);
+              ip.addImage(textField_path.text,textField_imagecomment.text,textField_imagetads.text);
               item_addimage.visible=false;
               textField_path.text="";
               textField_imagecomment.text="";
@@ -716,10 +703,10 @@ WindowAdd {
         placeholderText: qsTr("Введите комментарий")
        }
     function callbackOK(){
-                        mymodel.setComment(textField_newcomment.text);
+                        ip.setComment(textField_newcomment.text);
                         item_addcomment.visible=false;
                         textField_newcomment.text="";
-                        textField_comment.text="Комментарий: "+mymodel.showComment() }
+                        textField_comment.text="Комментарий: "+ip.showComment() }
     function callbackClose() { item_addcomment.visible=false }
 }
 
@@ -734,10 +721,10 @@ WindowAdd {
         placeholderText: qsTr("Введите тег")
        }
     function callbackOK(){
-                        mymodel.addTags(textField_newtag.text);
+                        ip.addTags(textField_newtag.text);
                         item_addtag.visible=false;
                         textField_newtag.text="";
-                        var str = mymodel.showTags();
+                        var str = ip.showTags();
                         if (str[0] === ',')
                             str = str.slice(1);
                         textField_tag.text="Тег: "+str;
@@ -863,8 +850,8 @@ Rectangle{
            }
        }
         onClicked: {
-            searchForm.max = mymodel.findByTags(textField_search.text)
-            var str=mymodel.fetchImage(0);
+            searchForm.max = ip.findByTags(textField_search.text)
+            var str=ip.fetchImage(0);
             var str1="file:"
             console.log(str.slice(0, str.indexOf('+')));
             image_sourse.source=str1+str.slice(0, str.indexOf('+'));
@@ -896,7 +883,7 @@ Rectangle{
           }
         onClicked: {
             searchForm.i=(searchForm.i-1+searchForm.max)%searchForm.max;
-            var str=mymodel.fetchImage(searchForm.i);
+            var str=ip.fetchImage(searchForm.i);
             var str1="file:"
             console.log(str.slice(0, str.indexOf('+')));
             image_sourse.source=str1+str.slice(0, str.indexOf('+'));
@@ -926,7 +913,7 @@ Rectangle{
           }
         onClicked: {
             searchForm.i=(searchForm.i+1)%searchForm.max;
-            var str=mymodel.fetchImage(searchForm.i);
+            var str=ip.fetchImage(searchForm.i);
             var str1="file:"
             console.log(str.slice(0, str.indexOf('+')));
             image_sourse.source=str1+str.slice(0, str.indexOf('+'));

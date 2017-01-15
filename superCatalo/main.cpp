@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 
     ImageProvider ip;
     ImageRedactor ir;
-    engine.rootContext()->setContextProperty("mymodel", &ip);
+    engine.rootContext()->setContextProperty("ip", &ip);
     engine.rootContext()->setContextProperty("redactor", &ir);
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
